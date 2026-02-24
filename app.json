@@ -1,0 +1,28 @@
+{
+  "expo": {
+    "name": "AquaGuard OptimusX",
+    "slug": "aquaguard-optimusx",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0A1628"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.aquaguard.optimusx"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0A1628"
+      },
+      "package": "com.aquaguard.optimusx"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}
