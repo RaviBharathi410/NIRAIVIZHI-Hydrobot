@@ -58,7 +58,7 @@ export default function OptimusXHomePage({ navigation }) {
     const QUICK_ACTIONS = [
         { title: t('tds'), icon: 'water-percent', screen: 'TDSTesting', color: '#0284C7' },     // Sky-600
         { title: t('ph'), icon: 'test-tube', screen: 'PHTesting', color: '#10B981' },           // Emerald-500
-        { title: t('turbidity'), icon: 'waves', screen: 'TurbidityTesting', color: '#6366F1' },  // Indigo-500
+        { title: t('turbidity'), icon: 'waves', screen: 'TurbidityTesting', color: COLORS.primary },  // Theme primary
         { title: t('fleetManagement'), icon: 'robot', screen: 'FleetManagement', color: '#4F46E5' }, // Indigo-600
         { title: t('aiVision'), icon: 'eye-outline', screen: 'AIVision', color: '#0891B2' },      // Cyan-600
         { title: t('smartCharging'), icon: 'lightning-bolt', screen: 'SmartCharging', color: '#F59E0B' }, // Amber-500

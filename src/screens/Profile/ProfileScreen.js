@@ -23,21 +23,21 @@ export default function ProfileScreen({ navigation }) {
             title: 'AI Symptoms Analysis',
             subtitle: 'ML-driven health screening',
             icon: 'brain',
-            color: "#6366F1",
+            color: COLORS.primary,
             screen: 'MLSymptoms'
         },
         {
             title: 'App Settings',
             subtitle: 'Configure language & alerts',
             icon: 'cog',
-            color: "#64748B",
+            color: COLORS.textMuted,
             screen: 'Settings'
         },
     ];
 
     return (
         <View style={styles.container}>
-            <LinearGradient colors={["#F8FAFC", "#F1F5F9"]} style={StyleSheet.absoluteFill} />
+            <LinearGradient colors={GRADIENTS.screen} style={StyleSheet.absoluteFill} />
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
                 <MotiView
@@ -117,19 +117,19 @@ export default function ProfileScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#F8FAFC" },
+    container: { flex: 1, backgroundColor: COLORS.background },
     content: { padding: 24, paddingTop: 60, paddingBottom: 40 },
     header: { alignItems: 'center', marginBottom: 30 },
     avatarGlow: {
         width: 100,
         height: 100,
         borderRadius: 50,
-        backgroundColor: 'white',
+        backgroundColor: COLORS.surface,
         justifyContent: 'center',
         alignItems: 'center',
         ...SHADOWS.glow(COLORS.primary, 15, 0.1),
         borderWidth: 4,
-        borderColor: 'rgba(37, 99, 235, 0.15)'
+        borderColor: 'rgba(59, 130, 246, 0.15)'
     },
     avatarContainer: {
         width: 80,
@@ -156,20 +156,20 @@ const styles = StyleSheet.create({
     statsRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 32 },
     statCard: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: COLORS.surface,
         marginHorizontal: 5,
         padding: 16,
         borderRadius: 16,
         alignItems: 'center',
         ...SHADOWS.small
     },
-    statValue: { fontSize: 18, fontWeight: '800', color: "#0F172A" },
-    statLabel: { fontSize: 12, fontWeight: '600', color: "#64748B", marginTop: 4 },
-    sectionTitle: { fontSize: 15, fontWeight: '800', color: "#64748B", marginBottom: 16, textTransform: 'uppercase', letterSpacing: 1 },
+    statValue: { fontSize: 18, fontWeight: '800', color: COLORS.textPrimary },
+    statLabel: { fontSize: 12, fontWeight: '600', color: COLORS.textSecondary, marginTop: 4 },
+    sectionTitle: { fontSize: 15, fontWeight: '800', color: COLORS.textSecondary, marginBottom: 16, textTransform: 'uppercase', letterSpacing: 1 },
     actionItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'white',
+        backgroundColor: COLORS.surface,
         padding: 16,
         borderRadius: 18,
         marginBottom: 12,
@@ -177,8 +177,8 @@ const styles = StyleSheet.create({
     },
     iconBox: { width: 48, height: 48, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
     actionInfo: { flex: 1 },
-    actionTitle: { fontSize: 16, fontWeight: '700', color: "#0F172A" },
-    actionSub: { fontSize: 13, color: "#64748B", marginTop: 2 },
+    actionTitle: { fontSize: 16, fontWeight: '700', color: COLORS.textPrimary },
+    actionSub: { fontSize: 13, color: COLORS.textSecondary, marginTop: 2 },
     logoutBtn: {
         backgroundColor: "#EF4444",
         padding: 18,

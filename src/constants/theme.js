@@ -41,13 +41,13 @@ export const COLORS = {
 
 // Rich Depth Gradients
 export const GRADIENTS = {
-    primary: [LIGHT_THEME.primary, '#4338CA'],
-    accent: ['#10B981', '#059669'],
-    card: ['#1E293B', '#0F172A'],
-    header: ['#0F172A', '#1E293B'],
-    screen: ['#0F172A', '#1E293B'],
-    glow: ['rgba(99, 102, 241, 0.15)', 'rgba(99, 102, 241, 0)'],
-    ring: [LIGHT_THEME.primary, '#06B6D4'],
+    primary: [LIGHT_THEME.primary, '#2563EB'],
+    accent: ['#1E3A8A', '#1E40AF'],
+    card: ['#262626', '#171717'],
+    header: ['#171717', '#262626'],
+    screen: ['#171717', '#262626'],
+    glow: ['rgba(59, 130, 246, 0.15)', 'rgba(59, 130, 246, 0)'],
+    ring: [LIGHT_THEME.primary, '#60A5FA'],
 };
 
 // Platform-Safe Production Fonts
@@ -153,11 +153,11 @@ export const TIMING = {
 
 // Glassmorphism System (Dark Mode optimized)
 export const GLASS = {
-    default: { blur: 30, bg: 'rgba(30, 41, 59, 0.5)', border: 'rgba(255, 255, 255, 0.08)' },
-    light: { blur: 20, bg: 'rgba(30, 41, 59, 0.3)', border: 'rgba(255, 255, 255, 0.06)' },
-    medium: { blur: 40, bg: 'rgba(30, 41, 59, 0.6)', border: 'rgba(255, 255, 255, 0.1)' },
-    elevated: { blur: 40, bg: 'rgba(30, 41, 59, 0.7)', border: 'rgba(255, 255, 255, 0.12)' },
-    heavy: { blur: 60, bg: 'rgba(15, 23, 42, 0.8)', border: 'rgba(255, 255, 255, 0.15)' },
+    default: { blur: 30, bg: 'rgba(38, 38, 38, 0.5)', border: 'rgba(255, 255, 255, 0.05)' },
+    light: { blur: 20, bg: 'rgba(38, 38, 38, 0.3)', border: 'rgba(255, 255, 255, 0.03)' },
+    medium: { blur: 40, bg: 'rgba(38, 38, 38, 0.6)', border: 'rgba(255, 255, 255, 0.06)' },
+    elevated: { blur: 40, bg: 'rgba(38, 38, 38, 0.7)', border: 'rgba(255, 255, 255, 0.08)' },
+    heavy: { blur: 60, bg: 'rgba(23, 23, 23, 0.8)', border: 'rgba(255, 255, 255, 0.1)' },
 };
 
 export default { COLORS, GRADIENTS, FONTS, FONTS_FALLBACK, TEXT, SPACE, SIZES, SHADOWS, SPRING, TIMING, GLASS };
