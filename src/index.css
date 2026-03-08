@@ -1,0 +1,122 @@
+/* @import "tailwindcss"; */
+/* @import "tw-animate-css"; */
+
+/* Aurora Flow Animations */
+
+@keyframes aurora-glow {
+
+    0%,
+    100% {
+        text-shadow: 0 0 40px rgba(0, 200, 200, 0.5);
+    }
+
+    50% {
+        text-shadow: 0 0 60px rgba(0, 255, 153, 0.7);
+    }
+}
+
+@keyframes sparkle {
+
+    0%,
+    100% {
+        opacity: 0.7;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+.hero-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #000c17;
+}
+
+.hero-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 2rem;
+    pointer-events: none;
+}
+
+.hero-text {
+    text-align: center;
+    max-width: 800px;
+    pointer-events: auto;
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    color: white;
+    animation: aurora-glow 4s ease-in-out infinite;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #00cccc, #00ff99);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-description {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn-primary {
+    background-color: #00cccc;
+    color: #001a1a;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #00e6e6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 204, 204, 0.4);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.4);
+}

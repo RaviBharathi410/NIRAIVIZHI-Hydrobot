@@ -1,0 +1,14 @@
+src/components/charts/SensorLineChart.native.tsx(61,21): error TS2322: Type 'DataPoint[]' is not assignable to type 'Record<string, unknown>[]'.
+  Type 'DataPoint' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'DataPoint'.
+src/components/charts/SensorLineChart.native.tsx(62,21): error TS2322: Type 'string' is not assignable to type 'never'.
+src/components/charts/SensorLineChart.native.tsx(63,29): error TS2322: Type 'string' is not assignable to type 'never'.
+src/components/charts/SensorLineChart.native.tsx(69,21): error TS2322: Type 'ChartPressState<{ x: number; y: { value: number; }; }>' is not assignable to type 'ChartPressState<{ x: never; y: Record<never, number>; }> | ChartPressState<{ x: never; y: Record<never, number>; }>[]'.
+  Type 'ChartPressState<{ x: number; y: { value: number; }; }>' is not assignable to type 'ChartPressState<{ x: never; y: Record<never, number>; }>'.
+    Type '{ x: number; y: { value: number; }; }' is not assignable to type '{ x: never; y: Record<never, number>; }'.
+      Types of property 'x' are incompatible.
+        Type 'number' is not assignable to type 'never'.
+src/components/charts/SensorLineChart.native.tsx(74,48): error TS2339: Property 'value' does not exist on type '{}'.
+src/components/charts/SensorLineChart.native.tsx(81,48): error TS2339: Property 'value' does not exist on type '{}'.
+src/screens/OptimusX/SmartChargingScreen.tsx(100,22): error TS2741: Property 'labels' is missing in type '{ data: number[]; color: string; height: number; title: string; }' but required in type 'SimpleChartProps'.
+src/screens/OptimusX/TurbidityTestingScreen.tsx(111,38): error TS2741: Property 'labels' is missing in type '{ data: number[]; color: string; height: number; title: string; }' but required in type 'SimpleChartProps'.

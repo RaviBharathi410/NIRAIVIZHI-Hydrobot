@@ -1,0 +1,97 @@
+import React, { ReactNode } from 'react';
+import { StyleSheet, View, Platform, ViewStyle, StyleProp } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { COLORS, SIZES, GLASS, SHADOWS } from '../constants/theme';
+import { MotiView } from 'moti';
+
+interface GlassCardProps {
+    children: ReactNode;
+    style?: StyleProp<ViewStyle>;
+    variant?: 'default' | 'elevated' | 'heavy' | 'light' | 'medium';
+    intensity?: number;
+    animate?: boolean;
+}
+
+/**
+ * Standard GlassCard component with cross-platform support.
+ * Uses BlurView for mobile and backdrop-filter for web.
+ */
+export default function GlassCard({
+    children,
+    style,
+    variant = 'default',
+    intensity,
+    animate = true
+}: GlassCardProps) {
+    const config = GLASS[variant] || GLASS.default;
+    const blurIntensity = intensity || config.blur;
+
+    // Cross-platform container styles
+    const glassStyle = Platform.select<any>({
+        ios: {
+            // For iOS, we primarily rely on BlurView for the blur effect.
+            // These styles are for the container around BlurView or if BlurView is not used.
+            backgroundColor: config.bg || 'rgba(255, 255, 255, 0.7)',
+            borderWidth: 1,
+            borderColor: config.border || 'rgba(15, 23, 42, 0.08)',
+            ...(variant === 'elevated' || variant === 'heavy' ? SHADOWS.medium : SHADOWS.small),
+        },
+        web: {
+            backgroundColor: config.bg || 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: `blur(${blurIntensity / 2}px)`,
+            WebkitBackdropFilter: `blur(${blurIntensity / 2}px)`,
+            borderWidth: 1,
+            borderColor: config.border || 'rgba(15, 23, 42, 0.08)',
+            boxShadow: variant === 'elevated' || variant === 'heavy'
+                ? '0px 10px 40px rgba(15, 23, 42, 0.06)'
+                : '0px 4px 20px rgba(15, 23, 42, 0.04)',
+        },
+        default: {
+            backgroundColor: config.bg,
+            borderWidth: 1,
+            borderColor: config.border,
+            ...(variant === 'elevated' || variant === 'heavy' ? SHADOWS.medium : SHADOWS.small),
+        }
+    });
+
+    const content = Platform.OS === 'web' ? (
+        <View style={[styles.inner, style, glassStyle as ViewStyle]}>
+            {children}
+        </View>
+    ) : (
+        <BlurView intensity={blurIntensity} tint="light" style={[styles.blur, style, { borderColor: config.border || COLORS.textMuted }]}>
+            <View style={[styles.inner, { borderBottomWidth: 0, borderTopWidth: 0, borderLeftWidth: 0, borderRightWidth: 0 }]}>
+                {children}
+            </View>
+        </BlurView>
+    );
+
+    if (!animate) return <View style={[styles.card, Platform.OS !== 'web' && glassStyle as ViewStyle]}>{content}</View>;
+
+    return (
+        <MotiView
+            from={{ opacity: 0, translateY: 10 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 150 }}
+            style={[styles.card, Platform.OS !== 'web' && glassStyle as ViewStyle]}
+        >
+            {content}
+        </MotiView>
+    );
+}
+
+const styles = StyleSheet.create({
+    card: {
+        marginVertical: 8,
+        borderRadius: SIZES.radiusLg,
+        overflow: 'hidden',
+    },
+    blur: {
+        borderRadius: SIZES.radiusLg,
+        borderWidth: 1,
+    },
+    inner: {
+        padding: 16,
+        borderRadius: SIZES.radiusLg,
+    },
+});
