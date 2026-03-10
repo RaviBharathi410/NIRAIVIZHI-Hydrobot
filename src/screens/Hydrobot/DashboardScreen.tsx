@@ -1,8 +1,9 @@
-import React from 'react';
-import { View, StyleSheet, useWindowDimensions, Platform } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, StyleSheet, useWindowDimensions, TouchableOpacity, ScrollView } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import Animated, { FadeIn, SlideInRight } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { useRobotStore } from '../../store/useRobotStore';
+import { useAlertStore } from '../../store/useAlertStore';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme/restyleTheme';
 import Text from '../../components/atoms/Text';
@@ -10,59 +11,143 @@ import { RobotStatusCard } from '../../components/robot/RobotStatusCard';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { HydrobotTabParamList } from '../../navigation/HydrobotNavigator';
+import { FABMenu } from '../../components/ui/FABMenu';
+import GlassCard from '../../components/GlassCard';
+import { RingGauge } from '../../components/RingGauge';
+import { calcPollutionIndex, getPollutionSeverity } from '../../utils/pollutionIndex';
 
 type Props = BottomTabScreenProps<HydrobotTabParamList, 'Fleet'>;
 
-export function DashboardScreen({ }: Props) {
+export function DashboardScreen({ navigation }: Props) {
     const theme = useTheme<Theme>();
     const { robots, isLoading, connectionStatus } = useRobotStore();
+    const alertStore = useAlertStore();
     const { width } = useWindowDimensions();
     const numColumns = width > 600 ? 2 : 1;
 
+    // Calculate composite Water Quality Index from all robots
+    const waterQuality = useMemo(() => {
+        if (robots.length === 0) return { index: 0, severity: getPollutionSeverity(0) };
+        const avgPh = robots.reduce((acc, r) => acc + Number(r.telemetry.ph), 0) / robots.length;
+        const avgTurbidity = robots.reduce((acc, r) => acc + Number(r.telemetry.turbidity), 0) / robots.length;
+        const avgTemp = robots.reduce((acc, r) => acc + Number(r.telemetry.temp), 0) / robots.length;
+        const avgTds = robots.reduce((acc, r) => acc + Number(r.telemetry.tds), 0) / robots.length;
+        const index = calcPollutionIndex({ ph: avgPh, turbidity: avgTurbidity, temperature: avgTemp, tds: avgTds });
+        // Invert for "quality" display: 100 - pollution = quality
+        const qualityScore = 100 - index;
+        return { index: qualityScore, severity: getPollutionSeverity(index) };
+    }, [robots]);
+
+    const unreadAlerts = alertStore.unreadCount();
+
     return (
         <View style={[styles.container, { backgroundColor: theme.colors.background as string }]}>
-            <Animated.View entering={FadeIn.delay(200)} style={styles.header}>
-                <View>
-                    <Text variant="heading">NIRAIVIZHI</Text>
-                    <Text variant="caption">Fleet Overview & Control</Text>
-                </View>
-                <View style={styles.headerRight}>
-                    <ConnectionBadge status={connectionStatus} />
-                    <View style={styles.statsIcon}>
-                        <MaterialCommunityIcons name="robot" size={24} color={theme.colors.primary as string} />
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                {/* Header */}
+                <Animated.View entering={FadeIn.delay(200)} style={styles.header}>
+                    <View>
+                        <Text variant="heading">HYDROBOT</Text>
+                        <Text variant="caption">CONTROL CENTER</Text>
                     </View>
-                </View>
-            </Animated.View>
+                    <View style={styles.headerRight}>
+                        <ConnectionBadge status={connectionStatus} />
+                        <TouchableOpacity
+                            style={styles.statsIcon}
+                            onPress={() => navigation.navigate('Alerts')}
+                        >
+                            <MaterialCommunityIcons name="bell-outline" size={24} color={theme.colors.text as string} />
+                            {unreadAlerts > 0 && (
+                                <View style={styles.alertBadge}>
+                                    <Text variant="caption" style={styles.alertBadgeText}>{unreadAlerts}</Text>
+                                </View>
+                            )}
+                        </TouchableOpacity>
+                    </View>
+                </Animated.View>
 
-            <View style={styles.summaryRow}>
-                <SummaryRing label="Active" count={robots.filter(r => r.isOnline).length} color={theme.colors.success as string} />
-                <SummaryRing label="Total" count={robots.length} color={theme.colors.primary as string} />
-                <SummaryRing label="Alerts" count={2} color={theme.colors.danger as string} />
-            </View>
+                {/* Water Quality Index Card */}
+                <Animated.View entering={FadeInDown.delay(300).springify()}>
+                    <GlassCard style={styles.wqiCard}>
+                        <View style={styles.wqiContent}>
+                            <View style={styles.wqiGauge}>
+                                <RingGauge
+                                    value={waterQuality.index}
+                                    maxValue={100}
+                                    size={100}
+                                    strokeWidth={10}
+                                    color={waterQuality.severity.color}
+                                />
+                            </View>
+                            <View style={styles.wqiInfo}>
+                                <Text variant="caption" style={{ fontWeight: '700', letterSpacing: 1 }}>WATER QUALITY INDEX</Text>
+                                <View style={[styles.severityBadge, { backgroundColor: waterQuality.severity.bgColor }]}>
+                                    <View style={[styles.severityDot, { backgroundColor: waterQuality.severity.color }]} />
+                                    <Text variant="caption" style={{ color: waterQuality.severity.color, fontWeight: '700' }}>
+                                        {waterQuality.severity.label.toUpperCase()}
+                                    </Text>
+                                </View>
+                                <Text variant="caption" style={{ opacity: 0.5, marginTop: 4 }}>
+                                    Composite score from all active sensors
+                                </Text>
+                            </View>
+                        </View>
+                    </GlassCard>
+                </Animated.View>
 
-            <FlashList
-                data={robots}
-                renderItem={({ item, index }) => (
-                    <RobotStatusCard
-                        robot={item}
-                        index={index}
-                        isLoading={isLoading}
-                    />
+                {/* Mission Summary */}
+                <Animated.View entering={FadeInDown.delay(400).springify()}>
+                    <GlassCard style={styles.missionCard}>
+                        <Text variant="caption" style={{ fontWeight: '700', marginBottom: 8 }}>TODAY'S MISSION</Text>
+                        <View style={styles.missionStats}>
+                            <MissionStat label="Distance" value="4.2 km" icon="map-marker-distance" />
+                            <MissionStat label="Trash" value="12 kg" icon="trash-can" />
+                            <MissionStat label="Time" value="2h 45m" icon="clock-outline" />
+                        </View>
+                    </GlassCard>
+                </Animated.View>
+
+                {/* Recent Alerts Strip */}
+                {unreadAlerts > 0 && (
+                    <Animated.View entering={FadeInDown.delay(500).springify()}>
+                        <View style={styles.alertsHeader}>
+                            <Text variant="caption" style={{ fontWeight: '700', letterSpacing: 1 }}>RECENT ALERTS</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('Alerts')}>
+                                <Text variant="caption" style={{ color: theme.colors.primary as string, fontWeight: '700' }}>VIEW ALL</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.alertsStrip}>
+                            {alertStore.alerts.filter(a => !a.read).slice(0, 5).map((alert) => (
+                                <GlassCard key={alert.id} style={styles.alertStripCard}>
+                                    <View style={[styles.alertDot, {
+                                        backgroundColor: alert.severity === 'critical' ? '#FF6B6B'
+                                            : alert.severity === 'warning' ? '#FFA94D' : '#22D3EE'
+                                    }]} />
+                                    <Text variant="caption" style={{ fontWeight: '600' }} numberOfLines={1}>{alert.title}</Text>
+                                    <Text variant="caption" style={{ fontSize: 11, opacity: 0.5 }} numberOfLines={1}>{alert.message}</Text>
+                                </GlassCard>
+                            ))}
+                        </ScrollView>
+                    </Animated.View>
                 )}
-                estimatedItemSize={140}
-                numColumns={numColumns}
-                contentContainerStyle={styles.listContent}
-                ListHeaderComponent={() => (
-                    <Text variant="subheading" style={{ marginBottom: 16 }}>FLEET STATUS</Text>
-                )}
-            />
 
-            {/* Floating Action Button (simplified for now) */}
-            <Animated.View entering={SlideInRight.delay(800)} style={styles.fabContainer}>
-                <View style={[styles.fab, { backgroundColor: theme.colors.primary as string }]}>
-                    <MaterialCommunityIcons name="plus" size={30} color="#FFF" />
-                </View>
-            </Animated.View>
+                {/* Fleet Overview */}
+                <Text variant="subheading" style={{ marginBottom: 16, marginTop: 8 }}>FLEET OVERVIEW</Text>
+
+                {robots.map((robot, index) => (
+                    <Animated.View key={robot.id} entering={FadeInDown.delay(600 + index * 80).springify()}>
+                        <RobotStatusCard
+                            robot={robot as any}
+                            index={index}
+                            isLoading={isLoading}
+                            onPress={() => navigation.navigate('Control', { id: robot.id })}
+                        />
+                    </Animated.View>
+                ))}
+
+                <View style={{ height: 120 }} />
+            </ScrollView>
+
+            <FABMenu />
         </View>
     );
 }
@@ -78,13 +163,13 @@ function ConnectionBadge({ status }: { status: string }) {
     );
 }
 
-function SummaryRing({ label, count, color }: { label: string, count: number, color: string }) {
+function MissionStat({ label, value, icon }: { label: string, value: string, icon: any }) {
+    const theme = useTheme<Theme>();
     return (
-        <View style={styles.summaryRing}>
-            <View style={[styles.ringInner, { borderColor: color }]}>
-                <Text variant="subheading" style={{ color }}>{count}</Text>
-            </View>
-            <Text variant="caption" style={{ marginTop: 4 }}>{label}</Text>
+        <View style={{ alignItems: 'center' }}>
+            <MaterialCommunityIcons name={icon} size={20} color={theme.colors.primary as string} />
+            <Text variant="caption" style={{ fontWeight: '700', marginVertical: 2 }}>{value}</Text>
+            <Text variant="caption" style={{ fontSize: 10, opacity: 0.6 }}>{label.toUpperCase()}</Text>
         </View>
     );
 }
@@ -93,11 +178,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+    scrollContent: {
+        paddingHorizontal: 20,
+    },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 20,
         paddingTop: 60,
         paddingBottom: 24,
     },
@@ -108,6 +195,22 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(99, 102, 241, 0.1)',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    alertBadge: {
+        position: 'absolute',
+        top: 4,
+        right: 4,
+        backgroundColor: '#FF6B6B',
+        borderRadius: 10,
+        width: 20,
+        height: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    alertBadgeText: {
+        color: '#FFF',
+        fontSize: 10,
+        fontWeight: '700',
     },
     headerRight: {
         flexDirection: 'row',
@@ -127,50 +230,63 @@ const styles = StyleSheet.create({
         height: 8,
         borderRadius: 4,
     },
-    summaryRow: {
+    wqiCard: {
+        padding: 20,
+        marginBottom: 16,
+    },
+    wqiContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    wqiGauge: {
+        marginRight: 20,
+    },
+    wqiInfo: {
+        flex: 1,
+    },
+    severityBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'flex-start',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        marginTop: 8,
+    },
+    severityDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        marginRight: 8,
+    },
+    missionCard: {
+        padding: 16,
+        marginBottom: 16,
+    },
+    missionStats: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        paddingVertical: 10,
-        marginBottom: 20,
-    },
-    summaryRing: {
         alignItems: 'center',
     },
-    ringInner: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        borderWidth: 4,
-        justifyContent: 'center',
+    alertsHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
+        marginBottom: 12,
     },
-    listContent: {
-        paddingHorizontal: 20,
-        paddingBottom: 100,
+    alertsStrip: {
+        marginBottom: 24,
     },
-    fabContainer: {
-        position: 'absolute',
-        bottom: 30,
-        right: 24,
+    alertStripCard: {
+        padding: 12,
+        marginRight: 12,
+        width: 220,
     },
-    fab: {
-        width: 64,
-        height: 64,
-        borderRadius: 32,
-        justifyContent: 'center',
-        alignItems: 'center',
-        ...Platform.select({
-            web: {
-                boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.3)',
-            } as any,
-            default: {
-                elevation: 8,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 10,
-            }
-        }),
+    alertDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        marginBottom: 6,
     },
 });
 

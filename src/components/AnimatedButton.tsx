@@ -21,10 +21,12 @@ interface AnimatedButtonProps {
     onPress?: () => void;
     style?: StyleProp<ViewStyle>;
     textStyle?: StyleProp<TextStyle>;
-    variant?: 'primary' | 'accent' | 'danger' | 'warning' | 'outline' | 'ghost';
+    variant?: 'primary' | 'accent' | 'danger' | 'warning' | 'outline' | 'ghost' | 'outlined';
     disabled?: boolean;
     loading?: boolean;
     icon?: keyof typeof MaterialCommunityIcons.glyphMap;
+    hideIcon?: boolean;
+    iconLeft?: keyof typeof MaterialCommunityIcons.glyphMap; // Legacy support
     iconRight?: keyof typeof MaterialCommunityIcons.glyphMap;
     haptic?: boolean;
 }
@@ -41,9 +43,12 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
     disabled = false,
     loading = false,
     icon,
+    iconLeft,
     iconRight,
     haptic = true
 }) => {
+    const finalIcon = icon || iconLeft;
+    const finalVariant = variant === 'outlined' ? 'outline' : variant;
     const scale = useRef(new Animated.Value(1)).current;
 
     const handlePressIn = () => {
@@ -78,14 +83,14 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
 
     const getColors = (): readonly string[] => {
         if (disabled) return [COLORS.border, COLORS.border];
-        if (variant === 'primary') return GRADIENTS.primary;
-        if (variant === 'accent') return GRADIENTS.accent;
-        if (variant === 'danger') return GRADIENTS.danger;
-        if (variant === 'warning') return GRADIENTS.warning;
+        if (finalVariant === 'primary') return GRADIENTS.primary;
+        if (finalVariant === 'accent') return GRADIENTS.accent;
+        if (finalVariant === 'danger') return (GRADIENTS as any).danger || GRADIENTS.primary;
+        if (finalVariant === 'warning') return (GRADIENTS as any).warning || GRADIENTS.primary;
         return ['transparent', 'transparent'];
     };
 
-    const isOutline = variant === 'outline';
+    const isOutline = finalVariant === 'outline';
     const textColor = isOutline ? COLORS.primary : COLORS.white;
 
     return (
@@ -107,7 +112,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
                     style,
                 ]}
             >
-                {!isOutline && variant !== 'ghost' && (
+                {!isOutline && finalVariant !== 'ghost' && (
                     <LinearGradient
                         colors={getColors() as any}
                         start={{ x: 0, y: 0 }}
@@ -121,9 +126,9 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
                         <ActivityIndicator color={textColor} size="small" />
                     ) : (
                         <>
-                            {icon && (
+                            {finalIcon && (
                                 <MaterialCommunityIcons
-                                    name={icon}
+                                    name={finalIcon}
                                     size={20}
                                     color={textColor}
                                     style={styles.leftIcon}

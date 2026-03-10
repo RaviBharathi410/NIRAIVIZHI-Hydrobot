@@ -31,7 +31,8 @@ if (Platform.OS === 'web') {
             const msg = args[0];
             if (msg.includes('useNativeDriver') ||
                 msg.includes('resizeMode') ||
-                msg.includes('pointerEvents')) {
+                msg.includes('pointerEvents') ||
+                msg.includes("FlashList's rendered size is not usable")) {
                 return;
             }
         }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
     useSharedValue,
@@ -13,14 +13,15 @@ import { Theme } from '../../theme/restyleTheme';
 
 interface JoystickProps {
     onCommand: (command: { x: number; y: number }) => void;
-    size?: number;
-    thumbSize?: number;
+    snapMode?: boolean;
 }
 
-const MAX_RADIUS = 80;
-const DEAD_ZONE = 15;
+const OUTER_SIZE = 240;
+const THUMB_SIZE = 60;
+const MAX_RADIUS = 100;
+const DEAD_ZONE = 20;
 
-export function Joystick({ onCommand, size = 200, thumbSize = 60 }: JoystickProps) {
+export function Joystick({ onCommand, snapMode = false }: JoystickProps) {
     const theme = useTheme<Theme>();
     const thumbX = useSharedValue(0);
     const thumbY = useSharedValue(0);
@@ -31,10 +32,21 @@ export function Joystick({ onCommand, size = 200, thumbSize = 60 }: JoystickProp
             onCommand({ x: 0, y: 0 });
             return;
         }
-        // Normalize to -1 to 1
+
+        let finalX = x / MAX_RADIUS;
+        let finalY = y / MAX_RADIUS;
+
+        if (snapMode) {
+            const angle = Math.atan2(y, x);
+            const snappedAngle = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
+            const radius = Math.min(dist, MAX_RADIUS) / MAX_RADIUS;
+            finalX = radius * Math.cos(snappedAngle);
+            finalY = radius * Math.sin(snappedAngle);
+        }
+
         onCommand({
-            x: parseFloat((x / MAX_RADIUS).toFixed(2)),
-            y: parseFloat((y / MAX_RADIUS).toFixed(2)),
+            x: parseFloat(finalX.toFixed(2)),
+            y: parseFloat(finalY.toFixed(2)),
         });
     };
 
@@ -61,18 +73,13 @@ export function Joystick({ onCommand, size = 200, thumbSize = 60 }: JoystickProp
     }));
 
     return (
-        <View style={[styles.container, { width: size, height: size }]}>
-            <View style={[styles.outerRing, { width: size, height: size, borderRadius: size / 2 }]}>
-                {/* Visual guidelines */}
-                <View style={[styles.guideV, { height: size }]} />
-                <View style={[styles.guideH, { width: size }]} />
+        <View style={styles.container}>
+            <View style={styles.outerRing}>
+                <View style={[styles.guideV, { height: OUTER_SIZE }]} />
+                <View style={[styles.guideH, { width: OUTER_SIZE }]} />
 
                 <GestureDetector gesture={gesture}>
-                    <Animated.View style={[
-                        styles.thumb,
-                        { width: thumbSize, height: thumbSize, borderRadius: thumbSize / 2 },
-                        thumbStyle
-                    ]} />
+                    <Animated.View style={[styles.thumb, thumbStyle]} />
                 </GestureDetector>
             </View>
         </View>
@@ -85,30 +92,37 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     outerRing: {
-        backgroundColor: 'rgba(15, 23, 42, 0.05)',
+        width: OUTER_SIZE,
+        height: OUTER_SIZE,
+        borderRadius: OUTER_SIZE / 2,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
         borderWidth: 2,
-        borderColor: 'rgba(15, 23, 42, 0.08)',
+        borderColor: 'rgba(255, 255, 255, 0.1)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     thumb: {
-        backgroundColor: '#6366F1', // Indigo 500
-        elevation: 8,
-        shadowColor: "#0F172A",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 10,
-        zIndex: 10,
+        width: THUMB_SIZE,
+        height: THUMB_SIZE,
+        borderRadius: THUMB_SIZE / 2,
+        backgroundColor: '#00E5FF', // Cyan brand color
+        elevation: 10,
+        shadowColor: "#00E5FF",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.5,
+        shadowRadius: 15,
+        borderWidth: 2,
+        borderColor: 'white',
     },
     guideV: {
         position: 'absolute',
         width: 1,
-        backgroundColor: 'rgba(15, 23, 42, 0.03)',
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
     },
     guideH: {
         position: 'absolute',
         height: 1,
-        backgroundColor: 'rgba(15, 23, 42, 0.03)',
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
     },
 });
 

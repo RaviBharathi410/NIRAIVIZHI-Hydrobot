@@ -1,0 +1,25 @@
+src/components/charts/SensorLineChart.native.tsx(52,21): error TS2322: Type 'DataPoint[]' is not assignable to type 'Record<string, unknown>[]'.
+  Type 'DataPoint' is not assignable to type 'Record<string, unknown>'.
+    Index signature for type 'string' is missing in type 'DataPoint'.
+src/components/charts/SensorLineChart.native.tsx(53,21): error TS2322: Type 'string' is not assignable to type 'never'.
+src/components/charts/SensorLineChart.native.tsx(54,29): error TS2322: Type 'string' is not assignable to type 'never'.
+src/components/charts/SensorLineChart.native.tsx(62,21): error TS2322: Type 'ChartPressState<{ x: number; y: { value: number; }; }>' is not assignable to type 'ChartPressState<{ x: never; y: Record<never, number>; }> | ChartPressState<{ x: never; y: Record<never, number>; }>[]'.
+  Type 'ChartPressState<{ x: number; y: { value: number; }; }>' is not assignable to type 'ChartPressState<{ x: never; y: Record<never, number>; }>'.
+    Type '{ x: number; y: { value: number; }; }' is not assignable to type '{ x: never; y: Record<never, number>; }'.
+      Types of property 'x' are incompatible.
+        Type 'number' is not assignable to type 'never'.
+src/components/charts/SensorLineChart.native.tsx(94,48): error TS2339: Property 'value' does not exist on type '{}'.
+src/components/charts/SensorLineChart.native.tsx(101,48): error TS2339: Property 'value' does not exist on type '{}'.
+src/navigation/HydrobotNavigator.tsx(30,13): error TS2322: Type '({ route }: { route: RouteProp<HydrobotTabParamList, keyof HydrobotTabParamList>; navigation: any; }) => { headerShown: true; ... 9 more ...; tabBarIcon: ({ color, size }: { ...; }) => Element; }' is not assignable to type 'BottomTabNavigationOptions | ((props: { route: RouteProp<HydrobotTabParamList, keyof HydrobotTabParamList>; navigation: any; }) => BottomTabNavigationOptions)'.
+  Type '({ route }: { route: RouteProp<HydrobotTabParamList, keyof HydrobotTabParamList>; navigation: any; }) => { headerShown: true; ... 9 more ...; tabBarIcon: ({ color, size }: { ...; }) => Element; }' is not assignable to type '(props: { route: RouteProp<HydrobotTabParamList, keyof HydrobotTabParamList>; navigation: any; }) => BottomTabNavigationOptions'.
+    Type '{ headerShown: true; headerTintColor: string; headerTitleStyle: { fontSize: number; fontWeight: string; color: string; }; headerRight: () => Element; headerTitle: string; headerStyle: { ...; }; ... 4 more ...; tabBarIcon: ({ color, size }: { ...; }) => Element; }' is not assignable to type 'BottomTabNavigationOptions'.
+      Type '{ headerShown: true; headerTintColor: string; headerTitleStyle: { fontSize: number; fontWeight: string; color: string; }; headerRight: () => Element; headerTitle: string; headerStyle: { ...; }; ... 4 more ...; tabBarIcon: ({ color, size }: { ...; }) => Element; }' is not assignable to type 'HeaderOptions'.
+        Types of property 'headerTitleStyle' are incompatible.
+          Type '{ fontSize: number; fontWeight: string; color: string; }' is not assignable to type 'false | Value | AnimatedInterpolation<string | number> | RegisteredStyle<TextStyle> | WithAnimatedObject<TextStyle> | WithAnimatedArray<...>'.
+            Type '{ fontSize: number; fontWeight: string; color: string; }' is not assignable to type 'WithAnimatedObject<TextStyle>'.
+              Types of property 'fontWeight' are incompatible.
+                Type 'string' is not assignable to type '"bold" | "regular" | "400" | "normal" | "100" | "200" | "300" | "500" | "600" | "700" | "800" | "900" | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | "ultralight" | "thin" | "light" | ... 7 more ... | AnimatedInterpolation<...>'.
+src/screens/Hydrobot/DashboardScreen.tsx(79,37): error TS2322: Type '{ value: number; maxValue: number; size: number; strokeWidth: number; color: string; backgroundColor: string; }' is not assignable to type 'IntrinsicAttributes & RingGaugeProps'.
+  Property 'backgroundColor' does not exist on type 'IntrinsicAttributes & RingGaugeProps'.
+src/screens/Hydrobot/WaterAnalyticsScreen.tsx(86,37): error TS2322: Type '{ value: number; maxValue: number; size: number; strokeWidth: number; color: string; backgroundColor: string; }' is not assignable to type 'IntrinsicAttributes & RingGaugeProps'.
+  Property 'backgroundColor' does not exist on type 'IntrinsicAttributes & RingGaugeProps'.

@@ -8,17 +8,19 @@ import GlassCard from '../../components/GlassCard';
 import SectionHeader from '../../components/SectionHeader';
 import IconBadge from '../../components/IconBadge';
 import AnimatedButton from '../../components/AnimatedButton';
+import ScreenHeader from '../../components/ScreenHeader';
 
 export default function CommunityMemberDashboard({ navigation }: any) {
     return (
         <View style={styles.container}>
             <LinearGradient colors={GRADIENTS.screen as any} style={StyleSheet.absoluteFill} />
 
-            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-                <MotiView from={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={styles.header}>
-                    <Text style={styles.greeting}>Namaste,</Text>
-                    <Text style={styles.userName}>Citizen</Text>
-                </MotiView>
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                <ScreenHeader
+                    title="Citizen Portal"
+                    subtitle="Namaste, Welcome back"
+                    showBack={false}
+                />
 
                 <GlassCard style={styles.heroCard} variant="heavy">
                     <View style={styles.heroRow}>
@@ -62,13 +64,7 @@ export default function CommunityMemberDashboard({ navigation }: any) {
                     </GlassCard>
                 </View>
 
-                <TouchableOpacity
-                    style={styles.exitBtn}
-                    onPress={() => navigation.navigate('Logout')}
-                >
-                    <MaterialCommunityIcons name="power" size={20} color={COLORS.textMuted} />
-                    <Text style={styles.exitText}>SIGN OUT</Text>
-                </TouchableOpacity>
+
             </ScrollView>
         </View>
     );
@@ -79,7 +75,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.background
     },
-    content: { padding: SPACE[6], paddingTop: 80, paddingBottom: 60 },
+    scrollContent: { padding: SPACE[6], paddingTop: 20, paddingBottom: 60 },
     header: { marginBottom: 30 },
     greeting: { ...FONTS.medium, fontSize: 18, color: COLORS.textSecondary },
     userName: { ...FONTS.extraBold, fontSize: 32, color: COLORS.text },

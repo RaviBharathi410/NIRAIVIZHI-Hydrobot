@@ -16,10 +16,10 @@ export function Badge({ variant = 'info', size = 'small', showDot, children }: B
 
     const getColors = () => {
         switch (variant) {
-            case 'success': return { bg: theme.colors.success + '15', text: theme.colors.success };
-            case 'warning': return { bg: theme.colors.warning + '15', text: theme.colors.warning };
-            case 'danger': return { bg: theme.colors.danger + '15', text: theme.colors.danger };
-            case 'info': default: return { bg: 'rgba(59, 130, 246, 0.1)', text: '#3B82F6' };
+            case 'success': return { bg: theme.colors.success + '20', text: theme.colors.success };
+            case 'warning': return { bg: theme.colors.warning + '20', text: theme.colors.warning };
+            case 'danger': return { bg: theme.colors.danger + '20', text: theme.colors.danger };
+            case 'info': default: return { bg: theme.colors.primaryLight + '20', text: theme.colors.primary };
         }
     };
 

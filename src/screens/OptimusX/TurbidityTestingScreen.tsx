@@ -11,6 +11,7 @@ import RingGauge from '../../components/RingGauge';
 import SensorConnectionButton from '../../components/SensorConnectionButton';
 import SimpleChart from '../../components/charts/SimpleChart';
 import SkeletonLoader from '../../components/SkeletonLoader';
+import ScreenHeader from '../../components/ScreenHeader';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { OptimusXStackParamList } from '../../navigation/OptimusXStack';
 
@@ -51,10 +52,11 @@ export default function TurbidityTestingScreen({ }: Props) {
         <View style={styles.container}>
             <LinearGradient colors={GRADIENTS.screen as any} style={StyleSheet.absoluteFill} />
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-                <MotiView from={{ opacity: 0, translateY: -10 }} animate={{ opacity: 1, translateY: 0 }}>
-                    <Text style={styles.title}>Clarification</Text>
-                    <Text style={styles.subtitle}>Turbidity & TSS Optical Diagnostic</Text>
-                </MotiView>
+                <ScreenHeader
+                    title="Clarification"
+                    subtitle="Turbidity & TSS Optical Diagnostic"
+                    style={{ paddingHorizontal: SPACE[6], paddingTop: 20 }}
+                />
 
                 <SensorConnectionButton
                     isConnected={isConnected}
@@ -128,7 +130,7 @@ export default function TurbidityTestingScreen({ }: Props) {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },
     loadingContent: { padding: SPACE[6], paddingTop: 80 },
-    content: { padding: SPACE[6], paddingTop: 80, paddingBottom: 50 },
+    content: { padding: SPACE[6], paddingTop: 20, paddingBottom: 50 },
     title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.white },
     subtitle: { ...FONTS.medium, fontSize: 16, color: COLORS.textSecondary, marginBottom: SPACE[6] },
     mainCard: { alignItems: 'center', paddingVertical: 40, marginBottom: 20 },

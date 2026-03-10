@@ -13,7 +13,7 @@ export function Skeleton({ width, height, borderRadius = 8 }: SkeletonProps) {
 
     useEffect(() => {
         opacity.value = withRepeat(
-            withTiming(0.8, { duration: 800 }),
+            withTiming(1, { duration: 800 }),
             -1,   // repeat forever
             true  // reverse each cycle
         );
@@ -29,7 +29,7 @@ export function Skeleton({ width, height, borderRadius = 8 }: SkeletonProps) {
                 width,
                 height,
                 borderRadius,
-                backgroundColor: 'rgba(15, 23, 42, 0.08)'
+                backgroundColor: 'rgba(255, 255, 255, 0.05)'
             } as any,
             style
         ]} />

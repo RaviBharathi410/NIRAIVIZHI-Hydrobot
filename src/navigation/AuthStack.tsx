@@ -20,7 +20,7 @@ export default function AuthStack() {
         <Stack.Navigator screenOptions={{
             headerShown: false,
             animation: 'fade',
-            contentStyle: { backgroundColor: COLORS.background }
+            contentStyle: { backgroundColor: COLORS.background },
         }}>
             <Stack.Screen name="Splash" component={IntroScreenX as any} />
             <Stack.Screen name="LanguageSelection" component={LanguageSelectionScreen as any} />

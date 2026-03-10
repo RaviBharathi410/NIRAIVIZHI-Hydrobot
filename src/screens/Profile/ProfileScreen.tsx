@@ -6,26 +6,13 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES, GRADIENTS, SPACE, SHADOWS, SPRING } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
+import ScreenHeader from '../../components/ScreenHeader';
 
 export default function ProfileScreen({ navigation }) {
     const { user, logout } = useAuth();
     const { t } = useLanguage();
 
     const ACTIONS = [
-        {
-            title: 'Patient Entry',
-            subtitle: 'Register & sync patient records',
-            icon: 'account-plus',
-            color: COLORS.primary,
-            screen: 'PatientEntry'
-        },
-        {
-            title: 'AI Symptoms Analysis',
-            subtitle: 'ML-driven health screening',
-            icon: 'brain',
-            color: COLORS.primary,
-            screen: 'MLSymptoms'
-        },
         {
             title: 'App Settings',
             subtitle: 'Configure language & alerts',
@@ -39,11 +26,17 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.container}>
             <LinearGradient colors={GRADIENTS.screen} style={StyleSheet.absoluteFill} />
 
-            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                <ScreenHeader
+                    title="Profile"
+                    subtitle="Medical Core Identity"
+                    showActions={false}
+                />
+
                 <MotiView
                     from={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    style={styles.header}
+                    style={styles.profileInfo}
                 >
                     <View style={styles.avatarGlow}>
                         <View style={styles.avatarContainer}>
@@ -118,8 +111,8 @@ export default function ProfileScreen({ navigation }) {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },
-    content: { padding: 24, paddingTop: 60, paddingBottom: 40 },
-    header: { alignItems: 'center', marginBottom: 30 },
+    scrollContent: { padding: 24, paddingTop: 20, paddingBottom: 40 },
+    profileInfo: { alignItems: 'center', marginBottom: 30 },
     avatarGlow: {
         width: 100,
         height: 100,

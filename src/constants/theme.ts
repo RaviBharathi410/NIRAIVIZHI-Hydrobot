@@ -4,25 +4,35 @@ import { LIGHT_THEME } from './lightTheme';
 // Professional Medical Slate/Indigo Palette
 export const COLORS = {
     primary: LIGHT_THEME.primary,      // Indigo-500 (#6366F1)
-    primaryDark: '#4338CA',           // Indigo-700
-    primaryLight: LIGHT_THEME.primaryLight, // Indigo-50
+    primaryDark: LIGHT_THEME.primaryHover,
+    primaryLight: LIGHT_THEME.primaryLight,
+    secondary: LIGHT_THEME.secondary,
+    secondaryHover: LIGHT_THEME.secondaryHover,
+    secondaryLight: LIGHT_THEME.secondaryLight,
     accent: LIGHT_THEME.primary,
     accentSoft: LIGHT_THEME.primaryLight,
     accentGlow: 'rgba(99, 102, 241, 0.2)',
     phScale: ['#EF4444', '#F59E0B', '#22C55E', '#3B82F6', '#6366F1'],
-    surfaceLight: '#F1F5F9', // Added surfaceLight for backward compatibility
+    surfaceLight: LIGHT_THEME.surfaceLight || '#F1F5F9',
+    backgroundLight: LIGHT_THEME.background,
+
+    // Icon Backgrounds
+    iconBlueBg: LIGHT_THEME.iconBlueBg,
+    iconGreenBg: LIGHT_THEME.iconGreenBg,
+    iconOrangeBg: LIGHT_THEME.iconOrangeBg,
+    iconPurpleBg: LIGHT_THEME.iconPurpleBg,
 
     // Semantic
-    success: LIGHT_THEME.success,     // Emerald-500
+    success: LIGHT_THEME.success,
     successSoft: LIGHT_THEME.successLight,
-    warning: LIGHT_THEME.warning,     // Amber-500
+    warning: LIGHT_THEME.warning,
     warningSoft: LIGHT_THEME.warningLight,
-    danger: LIGHT_THEME.danger,       // Red-500
+    danger: LIGHT_THEME.danger,
     dangerSoft: LIGHT_THEME.dangerLight,
-    info: LIGHT_THEME.info,           // Blue-500
+    info: LIGHT_THEME.info,
     infoSoft: LIGHT_THEME.infoLight,
 
-    // Surfaces (Light)
+    // Surfaces
     background: LIGHT_THEME.background,
     surface: LIGHT_THEME.surface,
     surfaceSecondary: LIGHT_THEME.surfaceSecondary,
@@ -30,8 +40,10 @@ export const COLORS = {
 
     // Text
     text: LIGHT_THEME.textPrimary,
+    textPrimary: LIGHT_THEME.textPrimary,
     textSecondary: LIGHT_THEME.textSecondary,
     textMuted: LIGHT_THEME.textMuted,
+    subText: LIGHT_THEME.textSecondary,
     white: '#FFFFFF',
     black: '#000000',
     transparent: 'transparent',
@@ -48,6 +60,8 @@ export const GRADIENTS = {
     accent: ['#1E3A8A', '#1E40AF'],
     warning: ['#F59E0B', '#D97706'],
     danger: ['#EF4444', '#DC2626'],
+    success: ['#22C55E', '#16A34A'],
+    info: ['#3B82F6', '#2563EB'],
     card: ['#FFFFFF', '#F1F5F9'],
     header: ['#F8FAFC', '#FFFFFF'],
     screen: ['#F8FAFC', '#F1F5F9'],
@@ -108,6 +122,14 @@ export const SIZES = {
     radiusFull: 999,
 } as const;
 
+// Shape helpers for consistency
+export const SHAPE = {
+    button: { borderRadius: SIZES.radius },
+    card: { borderRadius: SIZES.radiusLg },
+    pill: { borderRadius: SIZES.radiusFull },
+    iconBox: { borderRadius: SIZES.radiusSm },
+} as const;
+
 // Professional Soft Shadows
 export const SHADOWS = {
     small: Platform.select({
@@ -165,4 +187,4 @@ export const GLASS: Record<string, { blur: number, bg: string, border: string }>
     heavy: { blur: 50, bg: 'rgba(241, 245, 249, 0.9)', border: 'rgba(15, 23, 42, 0.15)' },
 };
 
-export default { COLORS, GRADIENTS, FONTS, FONTS_FALLBACK, TEXT, SPACE, SIZES, SHADOWS, SPRING, TIMING, GLASS };
+export default { COLORS, GRADIENTS, FONTS, FONTS_FALLBACK, TEXT, SPACE, SIZES, SHAPE, SHADOWS, SPRING, TIMING, GLASS };

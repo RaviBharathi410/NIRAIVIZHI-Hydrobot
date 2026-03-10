@@ -1,47 +1,46 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { BaseToast, ErrorToast, ToastConfig } from 'react-native-toast-message';
+import { BaseToast, ToastConfig } from 'react-native-toast-message';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/theme';
 
 export const toastConfig: ToastConfig = {
-    success: (props) => (
+    critical: (props) => (
         <BaseToast
             {...props}
-            style={{ borderLeftColor: COLORS.success, height: 70, borderRadius: 12 }}
+            style={{
+                borderLeftColor: '#FF6B6B',
+                backgroundColor: '#1A0505',
+                height: 70,
+                borderRadius: 12,
+                borderLeftWidth: 6
+            }}
             contentContainerStyle={{ paddingHorizontal: 15 }}
-            text1Style={{
-                fontSize: 16,
-                fontWeight: '700',
-                color: COLORS.text
-            }}
-            text2Style={{
-                fontSize: 13,
-                color: COLORS.textSecondary
-            }}
+            text1Style={{ color: '#FF6B6B', fontWeight: 'bold', fontSize: 16 }}
+            text2Style={{ color: '#AAAAAA', fontSize: 13 }}
             renderLeadingIcon={() => (
                 <View style={styles.leadingIcon}>
-                    <MaterialCommunityIcons name="check-circle" size={24} color={COLORS.success} />
+                    <MaterialCommunityIcons name="alert-octagon" size={24} color="#FF6B6B" />
                 </View>
             )}
         />
     ),
-    error: (props) => (
-        <ErrorToast
+    warning: (props) => (
+        <BaseToast
             {...props}
-            style={{ borderLeftColor: COLORS.danger, height: 70, borderRadius: 12 }}
-            text1Style={{
-                fontSize: 16,
-                fontWeight: '700',
-                color: COLORS.text
+            style={{
+                borderLeftColor: '#FFA94D',
+                backgroundColor: '#1A0D05',
+                height: 70,
+                borderRadius: 12,
+                borderLeftWidth: 6
             }}
-            text2Style={{
-                fontSize: 13,
-                color: COLORS.textSecondary
-            }}
+            contentContainerStyle={{ paddingHorizontal: 15 }}
+            text1Style={{ color: '#FFA94D', fontWeight: 'bold', fontSize: 16 }}
+            text2Style={{ color: '#AAAAAA', fontSize: 13 }}
             renderLeadingIcon={() => (
                 <View style={styles.leadingIcon}>
-                    <MaterialCommunityIcons name="alert-circle" size={24} color={COLORS.danger} />
+                    <MaterialCommunityIcons name="alert" size={24} color="#FFA94D" />
                 </View>
             )}
         />
@@ -49,19 +48,39 @@ export const toastConfig: ToastConfig = {
     info: (props) => (
         <BaseToast
             {...props}
-            style={{ borderLeftColor: COLORS.primary, height: 70, borderRadius: 12 }}
-            text1Style={{
-                fontSize: 16,
-                fontWeight: '700',
-                color: COLORS.text
+            style={{
+                borderLeftColor: '#3B82F6',
+                backgroundColor: '#050D1A',
+                height: 70,
+                borderRadius: 12,
+                borderLeftWidth: 6
             }}
-            text2Style={{
-                fontSize: 13,
-                color: COLORS.textSecondary
-            }}
+            contentContainerStyle={{ paddingHorizontal: 15 }}
+            text1Style={{ color: '#3B82F6', fontWeight: 'bold', fontSize: 16 }}
+            text2Style={{ color: '#AAAAAA', fontSize: 13 }}
             renderLeadingIcon={() => (
                 <View style={styles.leadingIcon}>
-                    <MaterialCommunityIcons name="information" size={24} color={COLORS.primary} />
+                    <MaterialCommunityIcons name="information" size={24} color="#3B82F6" />
+                </View>
+            )}
+        />
+    ),
+    success: (props) => (
+        <BaseToast
+            {...props}
+            style={{
+                borderLeftColor: '#34D399',
+                backgroundColor: '#051A0D',
+                height: 70,
+                borderRadius: 12,
+                borderLeftWidth: 6
+            }}
+            contentContainerStyle={{ paddingHorizontal: 15 }}
+            text1Style={{ color: '#34D399', fontWeight: 'bold', fontSize: 16 }}
+            text2Style={{ color: '#AAAAAA', fontSize: 13 }}
+            renderLeadingIcon={() => (
+                <View style={styles.leadingIcon}>
+                    <MaterialCommunityIcons name="check-circle" size={24} color="#34D399" />
                 </View>
             )}
         />
@@ -77,3 +96,5 @@ const styles = StyleSheet.create({
         paddingLeft: 10
     }
 });
+
+export default toastConfig;

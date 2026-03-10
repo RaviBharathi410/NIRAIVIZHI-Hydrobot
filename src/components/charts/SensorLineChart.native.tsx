@@ -1,11 +1,10 @@
 import React from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
 import { CartesianChart, Line, Area, useChartPressState } from 'victory-native';
-import { useFont, vec, LinearGradient } from '@shopify/react-native-skia';
+import { useFont } from '@shopify/react-native-skia';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme/restyleTheme';
 import Text from '../atoms/Text';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 interface DataPoint {
     timestamp: number;
@@ -22,72 +21,87 @@ interface SensorLineChartProps {
 
 export function SensorLineChart({
     data,
-    thresholdLow,
-    thresholdHigh,
+    thresholdLow = 6.5,
+    thresholdHigh = 8.5,
     color = '#00E5FF',
     label
 }: SensorLineChartProps) {
     const theme = useTheme<Theme>();
-
-    // Safety check for Skia objects that might be undefined on web initial load
-    let font = null;
-    try {
-        font = useFont(null, 11);
-    } catch (e) {
-        console.warn('Skia font loading failed, using fallback');
-    }
-
+    const font = useFont(null, 11); // Fallback to default
     const { state, isActive } = useChartPressState({ x: 0, y: { value: 0 } });
 
-    if (Platform.OS === 'web' && (!data || data.length === 0)) {
-        return <View style={[styles.container, { height: 200, justifyContent: 'center', alignItems: 'center' }]}><Text>No Data Available</Text></View>;
-    }
+    // Ensure data is sorted by timestamp
+    const sortedData = [...data].sort((a, b) => a.timestamp - b.timestamp);
 
     if (Platform.OS === 'web') {
         return (
-            <View style={[styles.container, { height: 200, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(15, 23, 42, 0.02)' }]}>
-                <Text variant="caption" style={{ color: theme.colors.primary, fontWeight: '700' }}>{label?.toUpperCase()}</Text>
-                <MaterialCommunityIcons name="chart-bell-curve-cumulative" size={40} color={theme.colors.primary + '40'} />
-                <Text variant="caption" style={{ marginTop: 10 }}>Live Analytics optimized for mobile</Text>
+            <View style={styles.webFallback}>
+                <Text variant="caption" style={{ color: theme.colors.primary, fontWeight: '700' }}>
+                    {label?.toUpperCase()}
+                </Text>
+                <Text variant="caption">Chart optimized for mobile view</Text>
             </View>
         );
     }
 
     return (
         <View style={styles.container}>
-            {label && <Text variant="caption" style={{ marginBottom: 10 }}>{label.toUpperCase()}</Text>}
-            <View style={{ height: 200, width: '100%' }}>
+            {label && <Text variant="caption" style={styles.label}>{label.toUpperCase()}</Text>}
+            <View style={{ height: 220, width: '100%' }}>
                 <CartesianChart
-                    // @ts-ignore
-                    data={data}
-                    // @ts-ignore
-                    xKey="x"
-                    // @ts-ignore
-                    yKeys={["y"]}
-                    // @ts-ignore
-                    domainPadding={{ top: 30, bottom: 30, left: 15, right: 15 }}
+                    data={sortedData}
+                    xKey="timestamp"
+                    yKeys={["value"]}
+                    domainPadding={{ top: 20, bottom: 20, left: 10, right: 10 }}
                     axisOptions={{
                         font,
                         labelColor: theme.colors.textMuted,
-                        lineColor: 'rgba(15, 23, 42, 0.05)'
+                        lineColor: theme.colors.border as string,
+                        tickCount: 5
                     }}
-                    // @ts-ignore
                     chartPressState={state}
                 >
-                    {({ points, chartBounds }: any) => (
+                    {({ points, chartBounds }) => (
                         <>
+                            {/* Threshold Lines */}
+                            {thresholdLow !== undefined && (
+                                <Line
+                                    points={[
+                                        { x: chartBounds.left, y: thresholdLow },
+                                        { x: chartBounds.right, y: thresholdLow }
+                                    ] as any}
+                                    color={theme.colors.danger}
+                                    strokeWidth={1}
+                                    // dashArray={[5, 5]}
+                                    opacity={0.3}
+                                />
+                            )}
+                            {thresholdHigh !== undefined && (
+                                <Line
+                                    points={[
+                                        { x: chartBounds.left, y: thresholdHigh },
+                                        { x: chartBounds.right, y: thresholdHigh }
+                                    ] as any}
+                                    color={theme.colors.danger}
+                                    strokeWidth={1}
+                                    // dashArray={[5, 5]}
+                                    opacity={0.3}
+                                />
+                            )}
+
+                            {/* Main Area & Line */}
                             <Area
-                                points={points.y}
+                                points={points.value}
                                 y0={chartBounds.bottom}
                                 color={color}
-                                opacity={0.1}
-                                animate={{ type: 'timing', duration: 500 }}
+                                opacity={0.15}
+                                animate={{ type: 'spring' }}
                             />
                             <Line
-                                points={points.y}
+                                points={points.value}
                                 color={color}
-                                strokeWidth={3}
-                                animate={{ type: "timing", duration: 500 }}
+                                strokeWidth={2}
+                                animate={{ type: 'spring' }}
                             />
                         </>
                     )}
@@ -100,12 +114,23 @@ export function SensorLineChart({
 const styles = StyleSheet.create({
     container: {
         padding: 16,
-        backgroundColor: 'rgba(255, 255, 255, 0.5)',
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: 'rgba(15, 23, 42, 0.05)',
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        borderRadius: 20,
         marginBottom: 16,
     },
+    label: {
+        marginBottom: 12,
+        fontWeight: '700',
+        letterSpacing: 1,
+    },
+    webFallback: {
+        height: 150,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+        borderRadius: 20,
+        marginBottom: 16,
+    }
 });
 
 export default SensorLineChart;

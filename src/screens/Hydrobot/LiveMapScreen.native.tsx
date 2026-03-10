@@ -6,14 +6,20 @@ import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme/restyleTheme';
 import Text from '../../components/atoms/Text';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import HeaderActions from '../../components/HeaderActions';
+
+import { useSharedValue, useAnimatedStyle, withRepeat, withTiming, interpolate } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 export function LiveMapScreen() {
     const theme = useTheme<Theme>();
-    const { robots } = useRobotStore();
+    const { robots, detections, selectedRobotId, setSelectedRobot } = useRobotStore();
+
+    const selectedRobot = robots.find(r => r.id === selectedRobotId) || robots[0];
 
     const initialRegion = {
-        latitude: 12.9716,
-        longitude: 77.5946,
+        latitude: selectedRobot?.location.latitude || 12.9716,
+        longitude: selectedRobot?.location.longitude || 77.5946,
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
     };
@@ -38,49 +44,85 @@ export function LiveMapScreen() {
                         <Marker
                             key={robot.id}
                             coordinate={robot.location}
-                            title={robot.name}
-                            description={robot.missionStatus}
+                            onPress={() => setSelectedRobot(robot.id)}
                         >
-                            <RobotMarker heading={robot.telemetry.heading} color={robot.isOnline ? (theme.colors.primary as string) : (theme.colors.textMuted as string)} />
+                            <PulseMarker color={robot.isOnline ? '#00E5FF' : '#94A3B8'} />
                         </Marker>
                     ))}
 
-                    {/* Mock Coverage area */}
-                    <Polygon
-                        coordinates={[
-                            { latitude: 12.972, longitude: 77.595 },
-                            { latitude: 12.975, longitude: 77.597 },
-                            { latitude: 12.974, longitude: 77.600 },
-                            { latitude: 12.971, longitude: 77.596 },
-                        ]}
-                        fillColor="rgba(99, 102, 241, 0.2)"
-                        strokeColor={theme.colors.primary as string}
-                        strokeWidth={2}
-                    />
+                    {detections.map(det => (
+                        <Marker
+                            key={det.id}
+                            coordinate={det.location}
+                        >
+                            <View style={[styles.detectionMarker, { backgroundColor: theme.colors.danger as string }]}>
+                                <MaterialCommunityIcons name="trash-can" size={12} color="white" />
+                            </View>
+                        </Marker>
+                    ))}
                 </MapView>
             )}
 
             <SafeAreaView style={styles.overlay}>
-                <View style={[styles.card, { backgroundColor: theme.colors.surface as string }]}>
-                    <View style={styles.row}>
-                        <MaterialCommunityIcons name="satellite-variant" size={24} color={theme.colors.primary as string} />
-                        <View style={{ marginLeft: 12 }}>
-                            <Text variant="body" style={{ fontWeight: '700' }}>Live Fleet Tracking</Text>
-                            <Text variant="caption">{robots.length} Robots Active</Text>
+                <View style={[styles.card, { backgroundColor: 'rgba(15, 23, 42, 0.8)' }]}>
+                    <View style={styles.headerRow}>
+                        <View style={styles.row}>
+                            <MaterialCommunityIcons name="satellite-variant" size={24} color="#00E5FF" />
+                            <View style={{ marginLeft: 12 }}>
+                                <Text variant="body" style={{ fontWeight: '700', color: 'white' }}>FLEET TRACKING</Text>
+                                <Text variant="caption" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>{robots.filter(r => r.isOnline).length} Active Units</Text>
+                            </View>
                         </View>
+                        <HeaderActions />
                     </View>
                 </View>
             </SafeAreaView>
+
+            {selectedRobot && (
+                <View style={[styles.bottomSheet, { backgroundColor: theme.colors.surface as string }]}>
+                    <View style={styles.sheetHeader}>
+                        <Text variant="subheading">{selectedRobot.name}</Text>
+                        <Text variant="caption" color="primary">{selectedRobot.missionStatus}</Text>
+                    </View>
+                    <View style={styles.sheetStats}>
+                        <MapStat label="BATT" value={`${selectedRobot.battery}%`} icon="battery-80" />
+                        <MapStat label="SPEED" value={`${selectedRobot.telemetry.speed}m/s`} icon="speedometer" />
+                        <MapStat label="pH" value={Number(selectedRobot.telemetry.ph).toFixed(1)} icon="test-tube" />
+                    </View>
+                </View>
+            )}
         </View>
     );
 }
 
-function RobotMarker({ heading, color }: { heading: number, color: string }) {
+function PulseMarker({ color }: { color: string }) {
+    const scale = useSharedValue(1);
+    const opacity = useSharedValue(1);
+
+    React.useEffect(() => {
+        scale.value = withRepeat(withTiming(2.5, { duration: 2000 }), -1, false);
+        opacity.value = withRepeat(withTiming(0, { duration: 2000 }), -1, false);
+    }, []);
+
+    const pulseStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+        opacity: opacity.value,
+    }));
+
     return (
         <View style={styles.markerContainer}>
-            <View style={[styles.markerIcon, { backgroundColor: color, transform: [{ rotate: `${heading}deg` }] }]}>
-                <MaterialCommunityIcons name="navigation" size={16} color="#FFF" />
-            </View>
+            <Animated.View style={[styles.pulse, { backgroundColor: color }, pulseStyle]} />
+            <View style={[styles.markerCore, { backgroundColor: color }]} />
+        </View>
+    );
+}
+
+function MapStat({ label, value, icon }: { label: string, value: string, icon: any }) {
+    return (
+        <View style={{ alignItems: 'center', flex: 1 }}>
+            <MaterialCommunityIcons name={icon} size={20} color="#00E5FF" />
+            <Text variant="caption" style={{ fontWeight: '700', marginTop: 4 }}>{value}</Text>
+            <Text variant="caption" style={{ fontSize: 10, opacity: 0.5 }}>{label}</Text>
         </View>
     );
 }
@@ -121,20 +163,56 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    bottomSheet: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        padding: 24,
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+        elevation: 20,
+    },
+    sheetHeader: {
+        marginBottom: 20,
+    },
+    sheetStats: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
     markerContainer: {
-        width: 32,
-        height: 32,
+        width: 40,
+        height: 40,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    markerIcon: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
+    pulse: {
+        position: 'absolute',
+        width: 16,
+        height: 16,
+        borderRadius: 8,
+    },
+    markerCore: {
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+        borderWidth: 2,
+        borderColor: 'white',
+    },
+    detectionMarker: {
+        width: 20,
+        height: 20,
+        borderRadius: 10,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 2,
-        borderColor: '#FFF',
+        borderWidth: 1.5,
+        borderColor: 'white',
     },
 });
 

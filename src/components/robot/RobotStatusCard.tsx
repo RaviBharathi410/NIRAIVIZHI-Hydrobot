@@ -1,93 +1,112 @@
 import React from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { formatDistanceToNow } from 'date-fns';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme/restyleTheme';
+import { formatDistanceToNow } from 'date-fns';
+import GlassCard from '../GlassCard';
 import Text from '../atoms/Text';
 import Skeleton from '../atoms/Skeleton';
 import BatteryGauge from './BatteryGauge';
 import ConnectionPulse from './ConnectionPulse';
 
-interface Robot {
-    id: string;
-    name: string;
-    isOnline: boolean;
-    battery: number;
-    missionStatus: string;
-    lastSeen: Date;
-}
-
 interface RobotStatusCardProps {
-    robot: Robot;
+    robot: {
+        id: string;
+        name: string;
+        isOnline: boolean;
+        battery: number;
+        missionStatus: string;
+        lastSeen?: Date | number;
+    };
     index: number;
     isLoading?: boolean;
+    onPress?: () => void;
 }
 
-export function RobotStatusCard({ robot, index, isLoading }: RobotStatusCardProps) {
+export function RobotStatusCard({ robot, index, isLoading, onPress }: RobotStatusCardProps) {
     const theme = useTheme<Theme>();
 
     if (isLoading) {
         return (
-            <View style={styles.card}>
+            <GlassCard style={styles.card}>
                 <Skeleton width="60%" height={20} />
-                <View style={{ height: 16 }} />
-                <Skeleton width="100%" height={60} />
-                <View style={{ height: 12 }} />
+                <View style={{ marginVertical: 12 }}>
+                    <Skeleton width="100%" height={60} />
+                </View>
                 <Skeleton width="40%" height={14} />
-            </View>
+            </GlassCard>
         );
     }
 
     return (
         <Animated.View
             entering={FadeInDown.delay(index * 60).springify()}
-            style={[styles.card, { backgroundColor: theme.colors.surface }]}
+            style={styles.container}
         >
-            <View style={styles.row}>
-                <Text variant="subheading" style={{ fontSize: 18 }}>{robot.name}</Text>
-                <ConnectionPulse connected={robot.isOnline} />
-            </View>
+            <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
+                <GlassCard style={styles.card}>
+                    <View style={styles.header}>
+                        <Text variant="subheading" style={styles.name}>{robot.name}</Text>
+                        <ConnectionPulse connected={robot.isOnline} />
+                    </View>
 
-            <View style={[styles.row, { marginVertical: 16 }]}>
-                <BatteryGauge percent={robot.battery} size={80} />
-                <View style={{ flex: 1, marginLeft: 20 }}>
-                    <Text variant="caption">Mission</Text>
-                    <Text variant="body" style={{ color: theme.colors.text }}>{robot.missionStatus}</Text>
-                </View>
-            </View>
+                    <View style={styles.content}>
+                        <BatteryGauge percent={robot.battery} size={70} />
+                        <View style={styles.statusInfo}>
+                            <Text variant="caption" style={styles.missionLabel}>MISSION</Text>
+                            <Text variant="body" numberOfLines={1} ellipsizeMode="tail" style={styles.missionText}>
+                                {robot.missionStatus}
+                            </Text>
+                        </View>
+                    </View>
 
-            <Text variant="caption" color="textMuted">
-                Last seen: {formatDistanceToNow(robot.lastSeen)} ago
-            </Text>
+                    <Text variant="caption" style={styles.lastSeen}>
+                        Last seen: {robot.lastSeen ? formatDistanceToNow(robot.lastSeen) : 'N/A'} ago
+                    </Text>
+                </GlassCard>
+            </TouchableOpacity>
         </Animated.View>
     );
 }
 
 const styles = StyleSheet.create({
-    card: {
-        padding: 20,
-        borderRadius: 20,
+    container: {
         marginBottom: 16,
-        borderWidth: 1,
-        borderColor: 'rgba(15, 23, 42, 0.08)',
-        ...Platform.select({
-            web: {
-                boxShadow: '0px 4px 8px rgba(15, 23, 42, 0.04)',
-            },
-            default: {
-                shadowColor: "#0F172A",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.04,
-                shadowRadius: 8,
-                elevation: 3,
-            }
-        }),
     },
-    row: {
+    card: {
+        padding: 16,
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    name: {
+        fontSize: 18,
+    },
+    content: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
+    },
+    statusInfo: {
+        marginLeft: 16,
+        flex: 1,
+    },
+    missionLabel: {
+        fontSize: 10,
+        fontWeight: '700',
+        opacity: 0.6,
+        marginBottom: 2,
+    },
+    missionText: {
+        fontSize: 14,
+    },
+    lastSeen: {
+        marginTop: 12,
+        opacity: 0.5,
+        fontStyle: 'italic',
     },
 });
 

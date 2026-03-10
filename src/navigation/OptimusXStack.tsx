@@ -26,6 +26,7 @@ import MLSymptomsScreen from '../screens/ML/MLSymptomsScreen';
 import ContactScreen from '../screens/Shared/ContactScreen';
 import JudgesFAQScreen from '../screens/Shared/JudgesFAQScreen';
 import LogoutScreen from '../screens/Shared/LogoutScreen';
+import HeaderActions from '../components/HeaderActions';
 import { COLORS, FONTS } from '../constants/theme';
 
 export type OptimusXStackParamList = {
@@ -65,13 +66,15 @@ const SCREEN_OPTIONS: NativeStackNavigationOptions = {
     headerTintColor: COLORS.text,
     headerTitleStyle: { ...FONTS.semiBold, fontSize: 18, color: COLORS.text } as any,
     headerShadowVisible: false,
+    headerShown: false,
+    headerRight: () => <HeaderActions />,
     contentStyle: { backgroundColor: COLORS.background },
 };
 
 export default function OptimusXStack() {
     return (
         <Stack.Navigator screenOptions={SCREEN_OPTIONS}>
-            <Stack.Screen name="Home" component={OptimusXHomePage as any} options={{ headerShown: false }} />
+            <Stack.Screen name="Home" component={OptimusXHomePage as any} options={{ title: 'Optimus X Hub' }} />
             <Stack.Screen name="TDSTesting" component={TDSTestingScreen as any} options={{ title: 'TDS Testing' }} />
             <Stack.Screen name="PHTesting" component={PHTestingScreen as any} options={{ title: 'pH Testing' }} />
             <Stack.Screen name="TurbidityTesting" component={TurbidityTestingScreen as any} options={{ title: 'Turbidity' }} />

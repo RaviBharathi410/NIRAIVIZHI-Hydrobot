@@ -1,8 +1,7 @@
-export type Role = 'optimusx' | 'admin' | 'asha' | 'health_official' | 'community_member' | 'village_leader';
+export type Role = 'optimusx' | 'asha' | 'health_official' | 'community_member' | 'village_leader';
 
 export const ROLES: Record<string, Role> = {
     OPTIMUS_X: 'optimusx',
-    ADMIN: 'admin',
     ASHA_WORKER: 'asha',
     HEALTH_OFFICIAL: 'health_official',
     COMMUNITY_MEMBER: 'community_member',
@@ -11,7 +10,6 @@ export const ROLES: Record<string, Role> = {
 
 export const ROLE_LABELS: Record<string, string> = {
     [ROLES.OPTIMUS_X]: 'OptimusX Operator',
-    [ROLES.ADMIN]: 'System Administrator',
     [ROLES.ASHA_WORKER]: 'ASHA Worker',
     [ROLES.HEALTH_OFFICIAL]: 'Health Official',
     [ROLES.COMMUNITY_MEMBER]: 'Community Member',

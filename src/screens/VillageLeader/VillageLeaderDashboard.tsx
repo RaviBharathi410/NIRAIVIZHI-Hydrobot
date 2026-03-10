@@ -8,6 +8,7 @@ import GlassCard from '../../components/GlassCard';
 import SectionHeader from '../../components/SectionHeader';
 import IconBadge from '../../components/IconBadge';
 import AnimatedButton from '../../components/AnimatedButton';
+import ScreenHeader from '../../components/ScreenHeader';
 
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -17,11 +18,12 @@ export default function VillageLeaderDashboard({ navigation }: any) {
         <View style={styles.container}>
             <LinearGradient colors={GRADIENTS.screen as any} style={StyleSheet.absoluteFill} />
 
-            <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-                <MotiView from={{ opacity: 0, translateX: -20 }} animate={{ opacity: 1, translateX: 0 }} style={styles.header}>
-                    <Text style={styles.title}>{t('communityDashboard')}</Text>
-                    <Text style={styles.subtitle}>{t('villageSummary')}</Text>
-                </MotiView>
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                <ScreenHeader
+                    title={t('communityDashboard')}
+                    subtitle={t('villageSummary')}
+                    showBack={false}
+                />
 
                 <SectionHeader title={t('fleetStatus')} />
                 <View style={styles.summaryGrid}>
@@ -64,12 +66,7 @@ export default function VillageLeaderDashboard({ navigation }: any) {
                     </View>
                 </GlassCard>
 
-                <TouchableOpacity
-                    style={styles.logoutBtn}
-                    onPress={() => navigation.navigate('Logout')}
-                >
-                    <Text style={styles.logoutText}>{t('logout')}</Text>
-                </TouchableOpacity>
+
             </ScrollView>
         </View>
     );
@@ -77,7 +74,7 @@ export default function VillageLeaderDashboard({ navigation }: any) {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },
-    content: { padding: SPACE[6], paddingTop: 80, paddingBottom: 60 },
+    scrollContent: { padding: SPACE[6], paddingTop: 20, paddingBottom: 60 },
     header: { marginBottom: 30 },
     title: { ...FONTS.extraBold, fontSize: 32, color: (COLORS as any).text },
     subtitle: { ...FONTS.medium, fontSize: 16, color: COLORS.textSecondary },

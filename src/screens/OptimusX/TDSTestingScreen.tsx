@@ -11,6 +11,7 @@ import SensorConnectionButton from '../../components/SensorConnectionButton';
 import SimpleChart from '../../components/charts/SimpleChart';
 import SkeletonLoader from '../../components/SkeletonLoader';
 import IconBadge from '../../components/IconBadge';
+import ScreenHeader from '../../components/ScreenHeader';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { OptimusXStackParamList } from '../../navigation/OptimusXStack';
 
@@ -53,14 +54,11 @@ export default function TDSTestingScreen({ }: Props) {
         <View style={styles.container}>
             <LinearGradient colors={GRADIENTS.screen as any} style={StyleSheet.absoluteFill} />
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-                <MotiView
-                    from={{ opacity: 0, translateX: -20 }}
-                    animate={{ opacity: 1, translateX: 0 }}
-                    style={styles.header}
-                >
-                    <Text style={styles.title}>TDS Analysis</Text>
-                    <Text style={styles.subtitle}>Total Dissolved Solids Precision Meter</Text>
-                </MotiView>
+                <ScreenHeader
+                    title="TDS Analysis"
+                    subtitle="Total Dissolved Solids Precision Meter"
+                    style={{ paddingHorizontal: SPACE[6], paddingTop: 20 }}
+                />
 
                 <SensorConnectionButton
                     isConnected={isConnected}
@@ -161,7 +159,7 @@ export default function TDSTestingScreen({ }: Props) {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },
     loadingContent: { padding: SPACE[6], paddingTop: 80 },
-    content: { padding: SPACE[6], paddingTop: 80, paddingBottom: 50 },
+    content: { padding: SPACE[6], paddingTop: 20, paddingBottom: 50 },
     header: { marginBottom: SPACE[6] },
     title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.white },
     subtitle: { ...FONTS.medium, fontSize: 16, color: COLORS.textSecondary },

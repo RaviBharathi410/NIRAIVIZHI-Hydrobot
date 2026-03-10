@@ -18,7 +18,6 @@ const ROLE_ICONS: Partial<Record<Role, RoleIcon>> = {
     [ROLES.HEALTH_OFFICIAL]: 'office-building',
     [ROLES.COMMUNITY_MEMBER]: 'account-group',
     [ROLES.VILLAGE_LEADER]: 'crown',
-    [ROLES.ADMIN]: 'shield-account', // Default or extra role
 };
 
 interface UserPortalScreenProps {

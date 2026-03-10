@@ -1,13 +1,8 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import Svg, { Path, Text as SvgText } from 'react-native-svg';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme/restyleTheme';
-
-interface BatteryGaugeProps {
-    percent: number;
-    size?: number;
-}
 
 function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
     const rad = ((angleDeg - 90) * Math.PI) / 180;
@@ -21,12 +16,17 @@ function arcPath(cx: number, cy: number, r: number, startAngle: number, endAngle
     return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`;
 }
 
+interface BatteryGaugeProps {
+    percent: number;
+    size?: number;
+}
+
 export function BatteryGauge({ percent, size = 80 }: BatteryGaugeProps) {
     const theme = useTheme<Theme>();
     const cx = size / 2;
     const cy = size / 2;
     const r = size * 0.38;
-    const filled = (Math.min(100, Math.max(0, percent)) / 100) * 240;
+    const filled = (percent / 100) * 240;
 
     const color = percent > 50
         ? theme.colors.success
@@ -35,22 +35,21 @@ export function BatteryGauge({ percent, size = 80 }: BatteryGaugeProps) {
             : theme.colors.danger;
 
     return (
-        <View style={{ width: size, height: size }}>
+        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
             <Svg width={size} height={size}>
-                {/* Background Track */}
+                {/* Background track */}
                 <Path
-                    d={arcPath(cx, cy, r, 150, 30 + 360)} // Wrap or adjust angles to match 240deg
-                    // Wait, 150 to 30 is 240 degrees (150 -> 390)
-                    // Let's re-calculate: 150 to 30 clockwise is 240 degrees.
-                    stroke="rgba(15, 23, 42, 0.08)"
+                    d={arcPath(cx, cy, r, 150, 390)}
+                    stroke={theme.colors.border as string}
                     strokeWidth={8}
                     fill="none"
                     strokeLinecap="round"
+                    opacity={0.3}
                 />
-                {/* Foreground Filled Arc */}
+                {/* Filled progress */}
                 <Path
                     d={arcPath(cx, cy, r, 150, 150 + filled)}
-                    stroke={color}
+                    stroke={color as string}
                     strokeWidth={8}
                     fill="none"
                     strokeLinecap="round"
@@ -60,7 +59,7 @@ export function BatteryGauge({ percent, size = 80 }: BatteryGaugeProps) {
                     y={cy + 6}
                     textAnchor="middle"
                     fontSize={14}
-                    fill={color}
+                    fill={color as string}
                     fontWeight="bold"
                 >
                     {percent}%

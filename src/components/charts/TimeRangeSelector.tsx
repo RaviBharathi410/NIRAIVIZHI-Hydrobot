@@ -5,33 +5,35 @@ import { Theme } from '../../theme/restyleTheme';
 import Text from '../atoms/Text';
 
 const RANGES = ['1H', '6H', '24H', '7D'] as const;
-type Range = typeof RANGES[number];
+export type TimeRange = typeof RANGES[number];
 
 interface TimeRangeSelectorProps {
-    selected: Range;
-    onChange: (range: Range) => void;
+    selected: TimeRange;
+    onChange: (range: TimeRange) => void;
 }
 
 export function TimeRangeSelector({ selected, onChange }: TimeRangeSelectorProps) {
     const theme = useTheme<Theme>();
 
     return (
-        <View style={styles.row}>
+        <View style={styles.container}>
             {RANGES.map(range => (
                 <Pressable
                     key={range}
                     onPress={() => onChange(range)}
                     style={[
                         styles.btn,
-                        { backgroundColor: selected === range ? theme.colors.primary : 'transparent' }
+                        selected === range && { backgroundColor: theme.colors.primary }
                     ]}
                 >
                     <Text
                         variant="caption"
-                        style={{
-                            color: selected === range ? '#FFF' : theme.colors.textSecondary,
-                            fontWeight: '700'
-                        }}
+                        style={[
+                            styles.text,
+                            selected === range
+                                ? { color: theme.colors.white, fontWeight: '700' }
+                                : { color: theme.colors.textMuted }
+                        ]}
                     >
                         {range}
                     </Text>
@@ -42,19 +44,24 @@ export function TimeRangeSelector({ selected, onChange }: TimeRangeSelectorProps
 }
 
 const styles = StyleSheet.create({
-    row: {
+    container: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(15, 23, 42, 0.05)',
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
         borderRadius: 12,
         padding: 4,
         alignSelf: 'center',
-        marginBottom: 20,
+        marginBottom: 16,
     },
     btn: {
         paddingHorizontal: 16,
         paddingVertical: 8,
         borderRadius: 8,
+        minWidth: 60,
+        alignItems: 'center',
     },
+    text: {
+        fontSize: 12,
+    }
 });
 
 export default TimeRangeSelector;

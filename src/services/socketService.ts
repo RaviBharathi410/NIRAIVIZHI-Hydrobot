@@ -43,8 +43,19 @@ class SocketService {
 
         // Listen for system alerts
         this.socket.on('alert', (alert: any) => {
-            console.log('CRITICAL ALERT RECEIVED:', alert);
-            // This would trigger a notification in a real app
+            console.log('ALERT RECEIVED:', alert);
+            // Route to alert store for live display
+            try {
+                const { useAlertStore } = require('../store/useAlertStore');
+                useAlertStore.getState().addAlert({
+                    severity: alert.severity || 'info',
+                    title: alert.title || 'System Alert',
+                    message: alert.message || '',
+                    robotId: alert.robotId,
+                });
+            } catch (e) {
+                console.warn('Alert store not available:', e);
+            }
         });
 
         // Listen for AI detections

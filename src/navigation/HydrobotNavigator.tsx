@@ -4,18 +4,19 @@ import { Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../theme/restyleTheme';
+import HeaderActions from '../components/HeaderActions';
 
-import DashboardScreen from '../screens/Hydrobot/DashboardScreen';
-import RobotControlScreen from '../screens/Hydrobot/RobotControlScreen';
-import WaterAnalyticsScreen from '../screens/Hydrobot/WaterAnalyticsScreen';
-import LiveMapScreen from '../screens/Hydrobot/LiveMapScreen';
-import AlertsScreen from '../screens/Hydrobot/AlertsScreen';
+import { DashboardScreen } from '../screens/Hydrobot/DashboardScreen';
+import { RobotControlScreen } from '../screens/Hydrobot/RobotControlScreen';
+import { WaterAnalyticsScreen } from '../screens/Hydrobot/WaterAnalyticsScreen';
+import { LiveMapScreen } from '../screens/Hydrobot/LiveMapScreen';
+import { AlertsScreen } from '../screens/Hydrobot/AlertsScreen';
 
 export type HydrobotTabParamList = {
     Fleet: undefined;
-    Control: undefined;
+    Control: { id?: string };
     Map: undefined;
-    Analytics: undefined;
+    Analytics: { id?: string };
     Alerts: undefined;
 };
 
@@ -27,7 +28,14 @@ export function HydrobotNavigator() {
     return (
         <Tab.Navigator
             screenOptions={({ route }) => ({
-                headerShown: false,
+                headerShown: true,
+                headerTintColor: theme.colors.text as string,
+                headerTitleStyle: { ...theme.textVariants.heading, fontSize: 20 },
+                headerRight: () => <HeaderActions />,
+                headerTitle: route.name === 'Fleet' ? 'NIRAIVIZHI' : route.name,
+                headerStyle: {
+                    backgroundColor: theme.colors.background as string,
+                },
                 tabBarActiveTintColor: theme.colors.primary as string,
                 tabBarInactiveTintColor: theme.colors.textMuted as string,
                 tabBarStyle: {

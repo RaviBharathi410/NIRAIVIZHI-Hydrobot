@@ -8,6 +8,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import GlassCard from '../../components/GlassCard';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/AuthStack';
+import storage from '../../utils/storage';
 
 type LanguageIcon = keyof typeof MaterialCommunityIcons.glyphMap;
 
@@ -32,8 +33,9 @@ interface LanguageSelectionScreenProps {
 export default function LanguageSelectionScreen({ navigation }: LanguageSelectionScreenProps) {
     const { locale, changeLanguage } = useLanguage();
 
-    const handleSelect = (langId: string) => {
+    const handleSelect = async (langId: string) => {
         changeLanguage(langId);
+        await storage.set(storage.KEYS.INTRO_SEEN, 'true');
         setTimeout(() => navigation.navigate('UserPortal'), 400);
     };
 

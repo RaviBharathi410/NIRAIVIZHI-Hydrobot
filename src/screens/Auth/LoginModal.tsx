@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MotiView } from 'moti';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SIZES, GRADIENTS, SPACE, SPRING } from '../../constants/theme';
-import { ROLE_LABELS, Role } from '../../constants/roles';
+import { ROLE_LABELS, ROLE_COLORS, Role, ROLES } from '../../constants/roles';
 import { useAuth } from '../../context/AuthContext';
 import AnimatedButton from '../../components/AnimatedButton';
 import GlassCard from '../../components/GlassCard';
@@ -18,10 +18,23 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ navigation, route }: LoginModalProps) {
-    const { role = 'optimusx' } = route?.params || {};
+    const { role = ROLES.OPTIMUS_X } = route?.params || {};
     const { login } = useAuth();
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+
+    // Auto-fill credentials based on role for easy demo/testing
+    const getInitialCreds = (r: string) => {
+        switch (r) {
+            case ROLES.ASHA_WORKER: return { u: 'asha@aquaguard.com', p: 'password123' };
+            case ROLES.HEALTH_OFFICIAL: return { u: 'health@aquaguard.com', p: 'password123' };
+            case ROLES.COMMUNITY_MEMBER: return { u: 'community@aquaguard.com', p: 'password123' };
+            case ROLES.VILLAGE_LEADER: return { u: 'leader@aquaguard.com', p: 'password123' };
+            default: return { u: 'optimusx@aquaguard.com', p: 'password123' };
+        }
+    };
+
+    const initialCreds = getInitialCreds(role);
+    const [username, setUsername] = useState(initialCreds.u);
+    const [password, setPassword] = useState(initialCreds.p);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -59,12 +72,14 @@ export default function LoginModal({ navigation, route }: LoginModalProps) {
                 style={styles.modalWrapper}
             >
                 <GlassCard style={styles.modal} variant="elevated">
-                    <View style={[styles.headerIcon, { backgroundColor: COLORS.primaryLight }]}>
-                        <MaterialCommunityIcons name="lock-outline" size={32} color={COLORS.primary} />
+                    <View style={[styles.headerIcon, { backgroundColor: ROLE_COLORS[roleKey] + '20' }]}>
+                        <MaterialCommunityIcons name="lock-outline" size={32} color={ROLE_COLORS[roleKey]} />
                     </View>
 
                     <Text style={styles.title}>Secure Login</Text>
-                    <Text style={styles.subtitle}>Institutional access for {ROLE_LABELS[roleKey] || 'OptimusX'}</Text>
+                    <Text style={[styles.subtitle, { color: ROLE_COLORS[roleKey] }]}>
+                        {ROLE_LABELS[roleKey] || 'OptimusX'} Portal
+                    </Text>
 
                     <View style={styles.form}>
                         <View style={styles.inputContainer}>
@@ -109,7 +124,7 @@ export default function LoginModal({ navigation, route }: LoginModalProps) {
                             onPress={handleLogin}
                             loading={loading}
                             variant="primary"
-                            style={styles.submitBtn}
+                            style={[styles.submitBtn, { backgroundColor: ROLE_COLORS[roleKey] }]}
                             iconRight="login"
                         />
 

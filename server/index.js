@@ -85,6 +85,86 @@ app.post('/api/login', async (req, res) => {
     else res.status(401).json({ error: 'Invalid credentials' });
 });
 
+// Patient Registry
+let patients = [];
+
+app.post('/api/patients', (req, res) => {
+    const patient = {
+        id: Date.now().toString(),
+        ...req.body,
+        timestamp: new Date().toISOString()
+    };
+    patients.push(patient);
+    console.log('Medical Record Logged:', patient.name);
+    res.status(201).json(patient);
+});
+
+// ML Health Screening Engine
+app.post('/api/ml/predict', (req, res) => {
+    const { symptoms } = req.body;
+
+    const keywords = {
+        'fever': 'Viral Infection',
+        'stomach': 'Water-borne Pathogens (Cholera/Typhoid)',
+        'skin': 'Industrial Chemical Irritation',
+        'eye': 'Bacterial Conjunctivitis',
+        'cramp': 'Acute Gastroenteritis'
+    };
+
+    let prediction = "General fatigue detected. Recommend standard water hygiene protocol.";
+    const lowerSymptoms = symptoms?.toLowerCase() || '';
+
+    for (const [key, val] of Object.entries(keywords)) {
+        if (lowerSymptoms.includes(key)) {
+            prediction = `High probability of ${val}. Immediate clinical follow-up and water source sampling recommended.`;
+            break;
+        }
+    }
+
+    res.json({
+        prediction,
+        confidence: 0.88 + (Math.random() * 0.1),
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Sensor history endpoint with time range filtering
+app.get('/api/robot/:id/sensor-history', (req, res) => {
+    const { id } = req.params;
+    const { range } = req.query; // '1H', '6H', '24H', '7D'
+    const rangeMs = {
+        '1H': 3600000,
+        '6H': 21600000,
+        '24H': 86400000,
+        '7D': 604800000,
+    }[range] || 86400000;
+
+    const cutoff = Date.now() - rangeMs;
+    const filtered = (history[id] || []).filter(p => p.timestamp > cutoff);
+    res.json(filtered);
+});
+
+// Alert cooldown tracking (prevent duplicate alerts)
+const alertCooldowns = {};
+
+function emitAlert(robotId, severity, title, message) {
+    const key = `${robotId}:${title}`;
+    const now = Date.now();
+    if (alertCooldowns[key] && now - alertCooldowns[key] < 30000) return; // 30s cooldown
+    alertCooldowns[key] = now;
+
+    const alert = {
+        id: Math.random().toString(36).substr(2, 9),
+        severity,
+        title,
+        message,
+        robotId,
+        timestamp: new Date().toISOString(),
+    };
+    io.emit('alert', alert);
+    console.log(`[ALERT] ${severity.toUpperCase()}: ${title} - ${message}`);
+}
+
 // Broadcast Loop (1Hz for general status)
 setInterval(() => {
     Object.keys(robots).forEach(id => {
@@ -93,6 +173,12 @@ setInterval(() => {
         // Simulate minor sensor noise
         robot.telemetry.ph = (parseFloat(robot.telemetry.ph) + (Math.random() - 0.5) * 0.05).toFixed(2);
         robot.telemetry.temp = (parseFloat(robot.telemetry.temp) + (Math.random() - 0.5) * 0.1).toFixed(1);
+        robot.telemetry.turbidity = Math.max(0, parseFloat(robot.telemetry.turbidity) + (Math.random() - 0.5) * 2).toFixed(0);
+
+        // Simulate battery drain (very slow)
+        if (robot.telemetry.speed > 0) {
+            robot.battery = Math.max(0, robot.battery - 0.02);
+        }
 
         // Simulation: GPS Drift / Movement
         if (robot.telemetry.speed > 0) {
@@ -102,8 +188,6 @@ setInterval(() => {
         }
 
         // Composite Pollution Index (CPI) Calculation
-        // Formula: CPI = (w1 * |pH - 7|) + (w2 * Turbidity) + (w3 * TDS / 100)
-        // Simplified for demo: Lower is better.
         const phDev = Math.abs(parseFloat(robot.telemetry.ph) - 7.0);
         const turbidity = parseFloat(robot.telemetry.turbidity);
         const tds = parseFloat(robot.telemetry.tds);
@@ -122,10 +206,35 @@ setInterval(() => {
             pollutionIndex: robot.telemetry.pollutionIndex
         });
 
-        // Limit history to last 100 points
-        if (history[id].length > 100) history[id].shift();
+        // Limit history to last 500 points
+        if (history[id].length > 500) history[id].shift();
 
         io.emit('telemetry', { robotId: id, ...robot });
+
+        // === Alert Generation ===
+        // Low battery alert
+        if (robot.battery < 15) {
+            emitAlert(id, 'critical', 'Battery Critical',
+                `${robot.name} battery at ${Math.round(robot.battery)}%. Immediate return to charging station required.`);
+        } else if (robot.battery < 25) {
+            emitAlert(id, 'warning', 'Battery Low',
+                `${robot.name} battery at ${Math.round(robot.battery)}%. Consider returning to station.`);
+        }
+
+        // High turbidity alert
+        if (turbidity > 80) {
+            emitAlert(id, 'critical', 'High Turbidity Detected',
+                `${robot.name} reports turbidity at ${turbidity} NTU — above safe limits.`);
+        } else if (turbidity > 60) {
+            emitAlert(id, 'warning', 'Elevated Turbidity',
+                `${robot.name} reports turbidity at ${turbidity} NTU — approaching warning level.`);
+        }
+
+        // pH anomaly
+        if (phDev > 1.5) {
+            emitAlert(id, 'warning', 'pH Anomaly',
+                `${robot.name} pH level at ${robot.telemetry.ph} — deviation from neutral exceeds threshold.`);
+        }
 
         // Simulate AI detection (10% chance per second)
         if (Math.random() > 0.9) {

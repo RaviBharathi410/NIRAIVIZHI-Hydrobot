@@ -11,10 +11,12 @@ import { useLanguage } from '../../context/LanguageContext';
 import apiService from '../../services/api';
 import GlassCard from '../../components/GlassCard';
 import IconBadge from '../../components/IconBadge';
+import HeaderActions from '../../components/HeaderActions';
 import SectionHeader from '../../components/SectionHeader';
 import SkeletonLoader from '../../components/SkeletonLoader';
 import WaterQualityHUD from '../../components/WaterQualityHUD';
 import AIVisionHUD from '../../components/AIVisionHUD';
+import Robot3D from '../../components/animations/Robot3D';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { OptimusXStackParamList } from '../../navigation/OptimusXStack';
 
@@ -109,15 +111,7 @@ export default function OptimusXHomePage({ navigation }: Props) {
                                 <Text style={styles.greeting}>Welcome, {user?.name || 'Explorer'}</Text>
                                 <Text style={styles.headerTitle}>Optimus Dashboard</Text>
                             </View>
-                            <TouchableOpacity
-                                activeOpacity={0.7}
-                                onPress={() => navigation.navigate('Settings')}
-                                style={styles.profileBtn}
-                            >
-                                <LinearGradient colors={GRADIENTS.primary as any} style={styles.profileGlow}>
-                                    <MaterialCommunityIcons name="cog" size={24} color={COLORS.white} />
-                                </LinearGradient>
-                            </TouchableOpacity>
+                            <HeaderActions />
                         </View>
                     </BlurView>
                 </View>
@@ -140,6 +134,10 @@ export default function OptimusXHomePage({ navigation }: Props) {
                             transition={{ type: 'spring', damping: 20 } as any}
                         >
                             <View style={styles.innerContent}>
+                                <View style={styles.animationContainer}>
+                                    <Robot3D />
+                                </View>
+
                                 <SectionHeader title="AI Navigation & Vision" />
                                 <AIVisionHUD />
 
@@ -248,6 +246,7 @@ export default function OptimusXHomePage({ navigation }: Props) {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },
     content: { paddingBottom: 100 },
+    animationContainer: { height: 180, width: '100%', borderRadius: 24, overflow: 'hidden', marginBottom: SPACE[6] },
     skeletonContainer: { padding: SPACE[6] },
     actionGridSkeleton: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
     header: { zIndex: 100 },

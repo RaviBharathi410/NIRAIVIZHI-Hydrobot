@@ -54,7 +54,9 @@ export const useRobotStore = create<RobotState>((set) => ({
     isLoading: false,
     connectionStatus: 'DISCONNECTED',
 
-    setRobots: (robots) => set({ robots }),
+    setRobots: (robots) => set({
+        robots: robots.map(r => ({ ...r, history: r.history || [] }))
+    }),
     setSelectedRobot: (id) => set({ selectedRobotId: id }),
 
     setConnectionStatus: (status) => set({ connectionStatus: status }),

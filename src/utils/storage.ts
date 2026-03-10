@@ -6,6 +6,7 @@ const KEYS = {
     LANGUAGE: '@aquaguard_language',
     USER_DATA: '@aquaguard_user_data',
     SENSOR_DATA: '@aquaguard_sensor_data',
+    INTRO_SEEN: '@aquaguard_intro_seen',
 };
 
 export const storage = {

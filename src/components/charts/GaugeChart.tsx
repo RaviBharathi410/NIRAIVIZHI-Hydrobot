@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Svg, { Path, Text as SvgText } from 'react-native-svg';
-import Animated, { useAnimatedProps, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedProps, useSharedValue, withSpring, interpolateColor } from 'react-native-reanimated';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme/restyleTheme';
+import Text from '../atoms/Text';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -34,69 +35,88 @@ export function GaugeChart({
     max = 50,
     label,
     unit = '°C',
-    size = 120
+    size = 140
 }: GaugeChartProps) {
     const theme = useTheme<Theme>();
     const cx = size / 2;
     const cy = size / 2;
-    const r = size * 0.4;
+    const r = size * 0.38;
 
-    const percentage = Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
-    const filled = (percentage / 100) * 240;
+    const progress = useSharedValue(0);
 
-    const getColor = (val: number) => {
-        if (val < 15) return '#3B82F6'; // Cold
-        if (val < 30) return theme.colors.success; // Normal
-        return theme.colors.danger; // Hot
-    };
+    useEffect(() => {
+        const percentage = Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
+        progress.value = withSpring(percentage, { damping: 15 });
+    }, [value]);
 
-    const color = getColor(value);
+    const animatedProps = useAnimatedProps(() => {
+        const filledArc = (progress.value / 100) * 240;
+        return {
+            d: arcPath(cx, cy, r, 150, 150 + filledArc),
+            stroke: interpolateColor(
+                progress.value,
+                [0, 50, 100],
+                ['#3B82F6', theme.colors.success as string, theme.colors.danger as string]
+            )
+        };
+    });
 
     return (
-        <View style={{ alignItems: 'center', width: size, height: size }}>
+        <View style={[styles.container, { width: size, height: size + 20 }]}>
             <Svg width={size} height={size}>
                 <Path
                     d={arcPath(cx, cy, r, 150, 390)}
-                    stroke="rgba(15, 23, 42, 0.05)"
+                    stroke={theme.colors.border as string}
                     strokeWidth={10}
                     fill="none"
                     strokeLinecap="round"
+                    opacity={0.1}
                 />
-                <Path
-                    d={arcPath(cx, cy, r, 150, 150 + filled)}
-                    stroke={color}
+                <AnimatedPath
+                    animatedProps={animatedProps}
                     strokeWidth={10}
                     fill="none"
                     strokeLinecap="round"
                 />
                 <SvgText
                     x={cx}
-                    y={cy - 5}
+                    y={cy + 8}
                     textAnchor="middle"
-                    fontSize={22}
-                    fill={theme.colors.text}
+                    fontSize={24}
+                    fill={theme.colors.text as string}
                     fontWeight="bold"
                 >
-                    {value}
+                    {value.toFixed(1)}
                 </SvgText>
                 <SvgText
                     x={cx}
-                    y={cy + 15}
+                    y={cy + 24}
                     textAnchor="middle"
-                    fontSize={12}
-                    fill={theme.colors.textMuted}
+                    fontSize={10}
+                    fill={theme.colors.textMuted as string}
                 >
                     {unit}
                 </SvgText>
             </Svg>
             {label && (
-                <View style={{ marginTop: -10 }}>
-                    <Text variant="caption" style={{ fontWeight: '700' }}>{label.toUpperCase()}</Text>
-                </View>
+                <Text variant="caption" style={styles.label}>
+                    {label.toUpperCase()}
+                </Text>
             )}
         </View>
     );
 }
 
-import Text from '../atoms/Text';
+const styles = StyleSheet.create({
+    container: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    label: {
+        marginTop: -10,
+        fontWeight: '700',
+        letterSpacing: 1,
+    },
+});
+
 export default GaugeChart;

@@ -8,6 +8,7 @@ import apiService from '../../services/api';
 import GlassCard from '../../components/GlassCard';
 import RingGauge from '../../components/RingGauge';
 import SkeletonLoader from '../../components/SkeletonLoader';
+import ScreenHeader from '../../components/ScreenHeader';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { OptimusXStackParamList } from '../../navigation/OptimusXStack';
 
@@ -110,10 +111,11 @@ export default function FleetManagementScreen({ navigation }: Props) {
         <View style={styles.container}>
             <LinearGradient colors={GRADIENTS.screen as any} style={StyleSheet.absoluteFill} />
 
-            <View style={styles.header}>
-                <Text style={styles.title}>Fleet Command</Text>
-                <Text style={styles.subtitle}>{bots.length} Active HydroBots on Mission</Text>
-            </View>
+            <ScreenHeader
+                title="Fleet Management"
+                subtitle={`${bots.length} Active HydroBots on Mission`}
+                style={{ paddingHorizontal: SPACE[6], paddingTop: 20 }}
+            />
 
             <FlatList
                 data={bots}

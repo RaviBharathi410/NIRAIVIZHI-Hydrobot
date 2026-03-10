@@ -17,6 +17,7 @@ import { COLORS, GRADIENTS, FONTS, SHADOWS, SPRING } from '../../constants/theme
 import GlassCard from '../../components/GlassCard';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthStackParamList } from '../../navigation/AuthStack';
+import storage from '../../utils/storage';
 
 const { width, height } = Dimensions.get('window');
 const CX = width / 2;
@@ -192,7 +193,7 @@ function GlitchTitle({ show }: GlitchTitleProps) {
         } as any}
         style={[styles.titleGhost, { color: 'rgba(239, 68, 68, 0.4)' }]}
       >
-        AQUA<Text style={{ color: 'rgba(239, 68, 68, 0.4)' }}>GUARD</Text>
+        NIRAI<Text style={{ color: 'rgba(239, 68, 68, 0.4)' }}>VIZHI</Text>
       </MotiText>
       <MotiText
         from={{ translateX: 0 }}
@@ -205,9 +206,9 @@ function GlitchTitle({ show }: GlitchTitleProps) {
         } as any}
         style={[styles.titleGhost, { color: 'rgba(59, 130, 246, 0.4)' }]}
       >
-        AQUA<Text style={{ color: 'rgba(59, 130, 246, 0.4)' }}>GUARD</Text>
+        NIRAI<Text style={{ color: 'rgba(59, 130, 246, 0.4)' }}>VIZHI</Text>
       </MotiText>
-      <Text style={styles.titleReal}>AQUA<Text style={styles.titleAccent}>GUARD</Text></Text>
+      <Text style={styles.titleReal}>NIRAI<Text style={styles.titleAccent}>VIZHI</Text></Text>
     </MotiView>
   );
 }
@@ -218,7 +219,7 @@ interface TickerSubtitleProps {
 
 // ─── Ticker subtitle ──────────────────────────────────────────────────────────
 function TickerSubtitle({ show }: TickerSubtitleProps) {
-  const FULL = '— O P T I M U S   X —';
+  const FULL = '— N I R A I V I Z H I —';
   const [chars, setChars] = useState('');
   useEffect(() => {
     if (!show) return;
@@ -340,31 +341,46 @@ export default function IntroScreen(props: IntroScreenProps) {
   const [barOn, setBarOn] = useState(false);
 
   useEffect(() => {
-    Animated.sequence([
-      Animated.timing(gridOp, { toValue: 1, duration: 500, useNativeDriver: Platform.OS !== 'web' }),
-      Animated.timing(hexProgress, { toValue: 1, duration: 900, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
-    ]).start();
+    const checkBypass = async () => {
+      const hasSeen = await storage.get(storage.KEYS.INTRO_SEEN);
+      if (hasSeen === 'true' || hasSeen === true) {
+        if (props.navigation) {
+          props.navigation.replace('UserPortal');
+          return true;
+        }
+      }
+      return false;
+    };
 
-    const timers = [
-      setTimeout(() => setSonarOn(true), 600),
-      setTimeout(() => setTitleOn(true), 1500),
-      setTimeout(() => setTickOn(true), 2000),
-      setTimeout(() => setMetricsOn(true), 2500),
-      setTimeout(() => setBarOn(true), 3000),
-      setTimeout(() => {
-        Animated.parallel([
-          Animated.timing(screenOp, { toValue: 0, duration: 600, easing: Easing.in(Easing.cubic), useNativeDriver: Platform.OS !== 'web' }),
-          Animated.timing(screenY, { toValue: -height * 0.08, duration: 600, easing: Easing.in(Easing.cubic), useNativeDriver: Platform.OS !== 'web' }),
-        ]).start(() => {
-          if (onFinish) {
-            onFinish();
-          } else if (props.navigation) {
-            props.navigation.replace('LanguageSelection');
-          }
-        });
-      }, 4800),
-    ];
-    return () => timers.forEach(clearTimeout);
+    checkBypass().then((bypassed) => {
+      if (bypassed) return;
+
+      Animated.sequence([
+        Animated.timing(gridOp, { toValue: 1, duration: 500, useNativeDriver: Platform.OS !== 'web' }),
+        Animated.timing(hexProgress, { toValue: 1, duration: 900, easing: Easing.out(Easing.cubic), useNativeDriver: false }),
+      ]).start();
+
+      const timers = [
+        setTimeout(() => setSonarOn(true), 600),
+        setTimeout(() => setTitleOn(true), 1500),
+        setTimeout(() => setTickOn(true), 2000),
+        setTimeout(() => setMetricsOn(true), 2500),
+        setTimeout(() => setBarOn(true), 3000),
+        setTimeout(() => {
+          Animated.parallel([
+            Animated.timing(screenOp, { toValue: 0, duration: 600, easing: Easing.in(Easing.cubic), useNativeDriver: Platform.OS !== 'web' }),
+            Animated.timing(screenY, { toValue: -height * 0.08, duration: 600, easing: Easing.in(Easing.cubic), useNativeDriver: Platform.OS !== 'web' }),
+          ]).start(() => {
+            if (onFinish) {
+              onFinish();
+            } else if (props.navigation) {
+              props.navigation.replace('LanguageSelection');
+            }
+          });
+        }, 4800),
+      ];
+      return () => timers.forEach(clearTimeout);
+    });
   }, [onFinish, gridOp, hexProgress, screenOp, screenY, props.navigation]);
 
   const particles = [...Array(15)].map((_, i) => ({
@@ -426,7 +442,7 @@ export default function IntroScreen(props: IntroScreenProps) {
         <View key={i} style={[styles.corner, c, { pointerEvents: 'none' } as any]} />
       ))}
 
-      <Text style={styles.version}>OPTIMUS OS  v2.4.0</Text>
+      <Text style={styles.version}>NIRAIVIZHI OS  v2.4.0</Text>
     </Animated.View>
   );
 }

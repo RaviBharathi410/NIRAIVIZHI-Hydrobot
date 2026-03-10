@@ -14,6 +14,8 @@ import { HydrobotTabParamList } from '../../navigation/HydrobotNavigator';
 
 type Props = BottomTabScreenProps<HydrobotTabParamList, 'Control'>;
 
+import { TelemetryStrip } from '../../components/robot/TelemetryStrip';
+
 export function RobotControlScreen({ route }: Props) {
     const theme = useTheme<Theme>();
     const { robots, updateRobotTelemetry: updateTelemetry, connectionStatus } = useRobotStore();
@@ -60,31 +62,45 @@ export function RobotControlScreen({ route }: Props) {
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background as string }]}>
-            {/* Telemetry Header */}
+            {/* Control Header */}
             <View style={styles.header}>
-                <View style={styles.headerHeader}>
-                    <Text variant="caption">{robot.name}</Text>
-                    <ConnectionBadge status={connectionStatus} />
-                </View>
-                <View style={[styles.telemetryRow, { gap: 20 }]}>
-                    <View style={styles.telemetryItem}>
-                        <MaterialCommunityIcons name="speedometer" size={20} color={theme.colors.primary as string} />
-                        <Text variant="subheading" style={{ marginLeft: 8 }}>{robot.telemetry.speed} m/s</Text>
+                <View style={styles.headerInfo}>
+                    <View>
+                        <Text variant="subheading">{robot.name}</Text>
+                        <ConnectionBadge status={connectionStatus} />
                     </View>
-                    <View style={styles.telemetryItem}>
-                        <MaterialCommunityIcons name="compass-outline" size={20} color={theme.colors.primary as string} />
-                        <Text variant="subheading" style={{ marginLeft: 8 }}>{robot.telemetry.heading.toFixed(0)}°</Text>
-                    </View>
-                    <View style={styles.telemetryItem}>
-                        <MaterialCommunityIcons name="battery-high" size={20} color={theme.colors.success as string} />
-                        <Text variant="subheading" style={{ marginLeft: 8 }}>{robot.battery}%</Text>
+                    <View style={styles.modeToggle}>
+                        <View style={styles.toggleRow}>
+                            <ControlModeBtn
+                                label="MANUAL"
+                                active={controlMode === 'MANUAL'}
+                                onPress={() => setControlMode('MANUAL')}
+                            />
+                            <ControlModeBtn
+                                label="AUTO"
+                                active={controlMode === 'AUTO'}
+                                onPress={() => setControlMode('AUTO')}
+                            />
+                        </View>
                     </View>
                 </View>
             </View>
 
-            {/* Control Area */}
+            {/* Telemetry Strip - 4 cells */}
+            <TelemetryStrip
+                speed={robot.telemetry.speed}
+                heading={robot.telemetry.heading}
+                power={100}
+                latency={24}
+            />
+
+            {/* Main Control Layout */}
             <View style={styles.controlLayout}>
-                <View style={styles.leftControls}>
+                <View style={styles.centerControls}>
+                    <Joystick onCommand={handleJoystick} />
+                </View>
+
+                <View style={styles.rightControls}>
                     <SpeedSlider
                         value={robot.telemetry.speed}
                         onValueChange={(v) => {
@@ -92,34 +108,16 @@ export function RobotControlScreen({ route }: Props) {
                             updateTelemetry(robot.id, { telemetry: { ...robot.telemetry, speed: v } } as any);
                         }}
                     />
-                    <Text variant="caption" style={{ marginTop: 10 }}>THROTTLE</Text>
-                </View>
-
-                <View style={styles.centerControls}>
-                    <Joystick onCommand={handleJoystick} />
-                    <Text variant="caption" style={{ marginTop: 20 }}>STEERING</Text>
                 </View>
             </View>
 
             {/* Footer Actions */}
             <View style={styles.footer}>
-                <EmergencyStopButton onTrigger={handleStop} size={90} />
-
-                <View style={styles.modeToggle}>
-                    <Text variant="caption" style={{ marginBottom: 8 }}>OPERATING MODE</Text>
-                    <View style={styles.toggleRow}>
-                        <ControlModeBtn
-                            label="MANUAL"
-                            active={controlMode === 'MANUAL'}
-                            onPress={() => setControlMode('MANUAL')}
-                        />
-                        <ControlModeBtn
-                            label="AUTO"
-                            active={controlMode === 'AUTO'}
-                            onPress={() => setControlMode('AUTO')}
-                        />
-                    </View>
+                <View style={styles.statusFooter}>
+                    <Text variant="mono" style={{ fontSize: 12 }}>GPS: {robot.location.latitude.toFixed(4)}, {robot.location.longitude.toFixed(4)}</Text>
+                    <Text variant="caption" style={{ opacity: 0.6 }}>BATTERY: {robot.battery}%</Text>
                 </View>
+                <EmergencyStopButton onTrigger={handleStop} size={90} />
             </View>
         </SafeAreaView>
     );
@@ -158,85 +156,66 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
-        paddingVertical: 16,
-        marginHorizontal: 20,
-        backgroundColor: '#FFF',
-        borderRadius: 20,
-        marginTop: 20,
-        paddingHorizontal: 16,
-        ...Platform.select({
-            web: {
-                boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.05)',
-            } as any,
-            default: {
-                elevation: 2,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.05,
-                shadowRadius: 5,
-            }
-        }),
+        paddingHorizontal: 20,
+        paddingTop: 20,
+        paddingBottom: 10,
     },
-    headerHeader: {
+    headerInfo: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 12,
-        paddingBottom: 8,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(15, 23, 42, 0.05)',
-    },
-    telemetryRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-    },
-    connectionBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    statusDot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-    },
-    telemetryItem: {
-        flexDirection: 'row',
         alignItems: 'center',
     },
     controlLayout: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
-    },
-    leftControls: {
-        alignItems: 'center',
-        marginRight: 40,
+        paddingHorizontal: 30,
     },
     centerControls: {
         flex: 1,
         alignItems: 'center',
+        justifyContent: 'center',
+    },
+    rightControls: {
+        alignItems: 'center',
+        width: 80,
     },
     footer: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 30,
+        paddingHorizontal: 20,
         paddingBottom: 40,
+        paddingTop: 20,
+    },
+    statusFooter: {
+        flex: 1,
     },
     modeToggle: {
         alignItems: 'flex-end',
     },
     toggleRow: {
         flexDirection: 'row',
-        backgroundColor: 'rgba(15, 23, 42, 0.05)',
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
         borderRadius: 12,
         padding: 4,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
     },
     modeBtn: {
         paddingHorizontal: 16,
-        paddingVertical: 10,
+        paddingVertical: 8,
         borderRadius: 8,
+    },
+    connectionBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 4,
+    },
+    statusDot: {
+        width: 6,
+        height: 6,
+        borderRadius: 3,
     },
 });
 

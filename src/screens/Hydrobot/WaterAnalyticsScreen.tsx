@@ -1,118 +1,237 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Pressable } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useRobotStore } from '../../store/useRobotStore';
+import { useSensorStore } from '../../store/useSensorStore';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme/restyleTheme';
 import Text from '../../components/atoms/Text';
-import { SensorLineChart } from '../../components/charts/SensorLineChart';
-import { GaugeChart } from '../../components/charts/GaugeChart';
-import { TimeRangeSelector } from '../../components/charts/TimeRangeSelector';
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { HydrobotTabParamList } from '../../navigation/HydrobotNavigator';
+import { SensorLineChart } from '../../components/charts/SensorLineChart.native';
+import { TimeRangeSelector, TimeRange } from '../../components/charts/TimeRangeSelector';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import Button from '../../components/atoms/Button';
+import GlassCard from '../../components/GlassCard';
+import { RingGauge } from '../../components/RingGauge';
+import { calcPollutionIndex, getPollutionSeverity } from '../../utils/pollutionIndex';
 
-type Props = BottomTabScreenProps<HydrobotTabParamList, 'Analytics'>;
-
-export function WaterAnalyticsScreen({ route }: Props) {
+export function WaterAnalyticsScreen() {
     const theme = useTheme<Theme>();
-    const { robots, fetchRobotHistory } = useRobotStore();
+    const { robots, selectedRobotId } = useRobotStore();
+    const sensorStore = useSensorStore();
+    const [range, setRange] = useState<TimeRange>('24H');
 
-    const activeRobotId = (route.params as any)?.id || (robots.length > 0 ? robots[0].id : '1');
-    const robot = robots.find(r => r.id === activeRobotId);
+    const robot = robots.find(r => r.id === selectedRobotId) || robots[0];
 
-    const [range, setRange] = useState<'1H' | '6H' | '24H' | '7D'>('1H');
+    // Calculate live pollution index
+    const pollutionData = useMemo(() => {
+        if (!robot) return { index: 0, severity: getPollutionSeverity(0) };
+        const index = calcPollutionIndex({
+            ph: Number(robot.telemetry.ph),
+            turbidity: Number(robot.telemetry.turbidity),
+            temperature: Number(robot.telemetry.temp),
+            tds: Number(robot.telemetry.tds),
+        });
+        return { index, severity: getPollutionSeverity(index) };
+    }, [robot]);
 
-    useEffect(() => {
-        if (!robot) return;
-        fetchRobotHistory(robot.id);
-        const interval = setInterval(() => fetchRobotHistory(robot.id), 5000);
-        return () => clearInterval(interval);
-    }, [robot, fetchRobotHistory]);
-
-    if (!robot) {
-        return (
-            <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background as string, justifyContent: 'center', alignItems: 'center' }]}>
-                <Text variant="subheading">No Data Available</Text>
-            </SafeAreaView>
-        );
-    }
-
-    // Format historical data for charts
-    const phHistory = robot.history.map(h => ({ timestamp: h.timestamp, value: h.ph }));
-    const turbidityHistory = robot.history.map(h => ({ timestamp: h.timestamp, value: h.turbidity }));
-    const pollutionHistory = robot.history.map(h => ({ timestamp: h.timestamp, value: h.pollutionIndex }));
-
-    const getIndexStatus = (index: number) => {
-        if (index < 30) return { label: 'EXCELLENT', color: theme.colors.success as string };
-        if (index < 50) return { label: 'GOOD', color: theme.colors.success as string };
-        if (index < 70) return { label: 'FAIR', color: theme.colors.warning as string };
-        return { label: 'POOR', color: theme.colors.danger as string };
+    // Mock history data based on time range
+    const getPoints = (r: TimeRange) => {
+        switch (r) {
+            case '1H': return 12;
+            case '6H': return 24;
+            case '24H': return 48;
+            case '7D': return 60;
+        }
     };
 
-    const status = getIndexStatus(robot.telemetry.pollutionIndex || 0);
+    const generateMockData = (base: number, variance: number) => {
+        const points = getPoints(range);
+        const timeSpan = range === '1H' ? 3600000 : range === '6H' ? 21600000 : range === '24H' ? 86400000 : 604800000;
+        return Array.from({ length: points }, (_, i) => ({
+            timestamp: Date.now() - (points - i) * (timeSpan / points),
+            value: base + (Math.random() - 0.5) * variance
+        }));
+    };
+
+    const phData = generateMockData(robot?.telemetry.ph || 7.2, 0.5);
+    const tdsData = generateMockData(robot?.telemetry.tds || 250, 40);
+    const turbidData = generateMockData(robot?.telemetry.turbidity || 45, 10);
+    const tempData = generateMockData(robot?.telemetry.temp || 28, 2);
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background as string }]}>
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                {/* Header */}
                 <View style={styles.header}>
-                    <Text variant="heading" style={{ fontSize: 24 }}>Water Quality</Text>
-                    <Text variant="caption">{robot.name} — Real-time Analysis</Text>
+                    <View>
+                        <Text variant="heading">ANALYTICS</Text>
+                        <Text variant="caption">Water Quality History</Text>
+                    </View>
+                    <TouchableOpacity style={styles.exportBtn}>
+                        <MaterialCommunityIcons name="file-export-outline" size={24} color={theme.colors.primary as string} />
+                    </TouchableOpacity>
                 </View>
 
+                {/* Pollution Index Card */}
+                <Animated.View entering={FadeInDown.delay(200).springify()}>
+                    <GlassCard style={styles.pollutionCard}>
+                        <View style={styles.pollutionContent}>
+                            <View style={styles.pollutionGauge}>
+                                <RingGauge
+                                    value={pollutionData.index}
+                                    maxValue={100}
+                                    size={120}
+                                    strokeWidth={12}
+                                    color={pollutionData.severity.color}
+                                />
+                            </View>
+                            <View style={styles.pollutionInfo}>
+                                <Text variant="caption" style={{ fontWeight: '700', letterSpacing: 1, marginBottom: 4 }}>
+                                    POLLUTION INDEX
+                                </Text>
+                                <View style={[styles.severityPill, { backgroundColor: pollutionData.severity.bgColor }]}>
+                                    <View style={[styles.dot, { backgroundColor: pollutionData.severity.color }]} />
+                                    <Text variant="body" style={{ color: pollutionData.severity.color, fontWeight: '700' }}>
+                                        {pollutionData.severity.label}
+                                    </Text>
+                                </View>
+
+                                {/* Live sensor values */}
+                                <View style={styles.liveSensors}>
+                                    <LiveSensorValue label="pH" value={robot ? Number(robot.telemetry.ph).toFixed(1) : '--'} color="#00E5FF" />
+                                    <LiveSensorValue label="TDS" value={robot ? String(Math.round(Number(robot.telemetry.tds))) : '--'} unit="ppm" color="#06B6D4" />
+                                    <LiveSensorValue label="Turb" value={robot ? String(Math.round(Number(robot.telemetry.turbidity))) : '--'} unit="NTU" color="#F59E0B" />
+                                    <LiveSensorValue label="Temp" value={robot ? Number(robot.telemetry.temp).toFixed(1) : '--'} unit="°C" color="#EF4444" />
+                                </View>
+                            </View>
+                        </View>
+                    </GlassCard>
+                </Animated.View>
+
+                {/* Time Range Selector — sticky */}
                 <TimeRangeSelector selected={range} onChange={setRange} />
 
-                <View style={styles.gaugeRow}>
-                    <GaugeChart value={robot.telemetry.temp} label="Temperature" unit="°C" size={130} />
-                    <GaugeChart value={robot.telemetry.ph} min={0} max={14} label="pH Level" unit="pH" size={130} />
+                {/* Sensor Charts */}
+                <View style={styles.chartsContainer}>
+                    <Animated.View entering={FadeInDown.delay(300).springify()}>
+                        <SensorPanel
+                            label="pH Level"
+                            currentValue={robot ? Number(robot.telemetry.ph).toFixed(2) : '--'}
+                            unit="pH"
+                            status={getSensorStatus(Number(robot?.telemetry.ph) || 7, sensorStore.sensors.ph.thresholds)}
+                        >
+                            <SensorLineChart
+                                label="pH Level"
+                                data={phData}
+                                color="#00E5FF"
+                                thresholdLow={6.5}
+                                thresholdHigh={8.5}
+                            />
+                        </SensorPanel>
+                    </Animated.View>
+
+                    <Animated.View entering={FadeInDown.delay(400).springify()}>
+                        <SensorPanel
+                            label="TDS"
+                            currentValue={robot?.telemetry.tds?.toString() || '--'}
+                            unit="ppm"
+                            status={getSensorStatus(Number(robot?.telemetry.tds) || 250, sensorStore.sensors.tds.thresholds)}
+                        >
+                            <SensorLineChart
+                                label="TDS (mg/L)"
+                                data={tdsData}
+                                color="#06B6D4"
+                                thresholdHigh={500}
+                            />
+                        </SensorPanel>
+                    </Animated.View>
+
+                    <Animated.View entering={FadeInDown.delay(500).springify()}>
+                        <SensorPanel
+                            label="Turbidity"
+                            currentValue={robot?.telemetry.turbidity?.toString() || '--'}
+                            unit="NTU"
+                            status={getSensorStatus(Number(robot?.telemetry.turbidity) || 45, sensorStore.sensors.turbidity.thresholds)}
+                        >
+                            <SensorLineChart
+                                label="Turbidity (NTU)"
+                                data={turbidData}
+                                color="#F59E0B"
+                            />
+                        </SensorPanel>
+                    </Animated.View>
+
+                    <Animated.View entering={FadeInDown.delay(600).springify()}>
+                        <SensorPanel
+                            label="Temperature"
+                            currentValue={robot ? Number(robot.telemetry.temp).toFixed(1) : '--'}
+                            unit="°C"
+                            status={getSensorStatus(Number(robot?.telemetry.temp) || 28, sensorStore.sensors.temperature.thresholds)}
+                        >
+                            <SensorLineChart
+                                label="Temperature (°C)"
+                                data={tempData}
+                                color="#EF4444"
+                            />
+                        </SensorPanel>
+                    </Animated.View>
                 </View>
 
-                <View style={styles.summaryCard}>
-                    <Text variant="body" style={{ fontWeight: '700', marginBottom: 4 }}>Pollution Index</Text>
-                    <View style={styles.indexRow}>
-                        <Text variant="heading" style={{ color: status.color, fontSize: 36 }}>
-                            {robot.telemetry.pollutionIndex || '--'}
-                        </Text>
-                        <View style={styles.indexStatus}>
-                            <Text variant="caption" style={{ color: status.color, fontWeight: '700' }}>{status.label}</Text>
-                            <Text variant="caption" color="textMuted">Composite Score</Text>
-                        </View>
-                    </View>
-                </View>
-
-                <SensorLineChart
-                    label="pH Trend"
-                    data={phHistory}
-                    color={theme.colors.primary as string}
-                />
-
-                <SensorLineChart
-                    label="Turbidity Trend"
-                    data={turbidityHistory}
-                    color="#F59E0B"
-                />
-
-                <SensorLineChart
-                    label="Pollution Index Trend"
-                    data={pollutionHistory}
-                    color={status.color}
-                />
-
-                <View style={styles.statsGrid}>
-                    <StatItem label="TDS" value={`${robot.telemetry.tds} ppm`} status="Optimal" color={theme.colors.success as string} />
-                    <StatItem label="Dissolved O2" value="8.4 mg/L" status="Normal" color={theme.colors.success as string} />
-                </View>
+                {/* Export button */}
+                <Button
+                    variant="primary"
+                    style={{ marginTop: 20, marginBottom: 40 }}
+                >
+                    DOWNLOAD PDF REPORT
+                </Button>
             </ScrollView>
         </SafeAreaView>
     );
 }
 
-function StatItem({ label, value, status, color }: { label: string, value: string, status: string, color: string }) {
+function LiveSensorValue({ label, value, unit, color }: { label: string; value: string; unit?: string; color: string }) {
     return (
-        <View style={styles.statItem}>
-            <Text variant="caption" color="textMuted">{label}</Text>
-            <Text variant="subheading">{value}</Text>
-            <Text variant="caption" style={{ color, fontWeight: '700' }}>{status}</Text>
+        <View style={styles.liveItem}>
+            <Text variant="caption" style={{ fontSize: 10, opacity: 0.5 }}>{label}</Text>
+            <Text variant="mono" style={{ color, fontSize: 13, fontWeight: '600' }}>
+                {value}
+                {unit && <Text variant="caption" style={{ fontSize: 9 }}> {unit}</Text>}
+            </Text>
         </View>
     );
+}
+
+function SensorPanel({ label, currentValue, unit, status, children }: {
+    label: string; currentValue: string; unit: string;
+    status: { label: string; color: string }; children: React.ReactNode;
+}) {
+    const theme = useTheme<Theme>();
+    return (
+        <GlassCard style={styles.sensorPanel}>
+            <View style={styles.sensorPanelHeader}>
+                <View>
+                    <Text variant="body" style={{ fontWeight: '600' }}>{label}</Text>
+                </View>
+                <View style={styles.sensorPanelRight}>
+                    <Text variant="mono" style={{ fontSize: 18, fontWeight: '700' }}>{currentValue}</Text>
+                    <Text variant="caption" style={{ marginLeft: 4 }}>{unit}</Text>
+                    <Pressable style={[styles.statusBadge, { backgroundColor: status.color + '20' }]}>
+                        <View style={[styles.dot, { backgroundColor: status.color, width: 6, height: 6 }]} />
+                        <Text variant="caption" style={{ color: status.color, fontWeight: '600', fontSize: 10 }}>
+                            {status.label}
+                        </Text>
+                    </Pressable>
+                </View>
+            </View>
+            {children}
+        </GlassCard>
+    );
+}
+
+function getSensorStatus(value: number, thresholds: { caution: number; critical: number }): { label: string; color: string } {
+    if (value >= thresholds.critical) return { label: 'CRITICAL', color: '#FF6B6B' };
+    if (value >= thresholds.caution) return { label: 'CAUTION', color: '#FFA94D' };
+    return { label: 'NORMAL', color: '#34D399' };
 }
 
 const styles = StyleSheet.create({
@@ -120,44 +239,84 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     scrollContent: {
-        paddingBottom: 40,
         paddingHorizontal: 20,
+        paddingTop: 40,
     },
     header: {
-        paddingVertical: 24,
-    },
-    gaugeRow: {
         flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginBottom: 20,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 24,
     },
-    summaryCard: {
+    exportBtn: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    pollutionCard: {
         padding: 20,
-        backgroundColor: '#FFF',
-        borderRadius: 20,
-        marginBottom: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(15, 23, 42, 0.05)',
+        marginBottom: 24,
     },
-    indexRow: {
+    pollutionContent: {
         flexDirection: 'row',
         alignItems: 'center',
     },
-    indexStatus: {
-        marginLeft: 16,
+    pollutionGauge: {
+        marginRight: 20,
     },
-    statsGrid: {
+    pollutionInfo: {
+        flex: 1,
+    },
+    severityPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'flex-start',
+        paddingHorizontal: 14,
+        paddingVertical: 6,
+        borderRadius: 20,
+        marginBottom: 12,
+    },
+    dot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        marginRight: 8,
+    },
+    liveSensors: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 10,
+        marginTop: 4,
     },
-    statItem: {
-        flex: 0.48,
+    liveItem: {
+        alignItems: 'center',
+    },
+    chartsContainer: {
+        gap: 20,
+        marginTop: 20,
+    },
+    sensorPanel: {
         padding: 16,
-        backgroundColor: '#FFF',
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: 'rgba(15, 23, 42, 0.05)',
+    },
+    sensorPanelHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    sensorPanelRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    statusBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+        marginLeft: 10,
     },
 });
 

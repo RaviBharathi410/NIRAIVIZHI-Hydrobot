@@ -10,6 +10,7 @@ import MLSymptomsScreen from '../screens/ML/MLSymptomsScreen';
 import SettingsScreen from '../screens/Settings/SettingsScreen';
 import GenerateReportScreen from '../screens/Asha/GenerateReportScreen';
 import LogoutScreen from '../screens/Shared/LogoutScreen';
+import HeaderActions from '../components/HeaderActions';
 import { COLORS, FONTS } from '../constants/theme';
 
 export type AshaStackParamList = {
@@ -34,13 +35,15 @@ const SCREEN_OPTIONS: NativeStackNavigationOptions = {
     headerTintColor: COLORS.text,
     headerTitleStyle: { ...FONTS.semiBold, fontSize: 18, color: COLORS.text } as any,
     headerShadowVisible: false,
+    headerShown: false,
+    headerRight: () => <HeaderActions />,
     contentStyle: { backgroundColor: COLORS.background },
 };
 
 export default function AshaStack() {
     return (
         <Stack.Navigator screenOptions={SCREEN_OPTIONS}>
-            <Stack.Screen name="ASHAHome" component={ASHAWorkerDashboard as any} options={{ headerShown: false }} />
+            <Stack.Screen name="ASHAHome" component={ASHAWorkerDashboard as any} options={{ title: 'ASHA Dashboard' }} />
             <Stack.Screen name="WaterTestForm" component={WaterTestForm as any} options={{ title: 'Water Test' }} />
             <Stack.Screen name="PatientVisitsList" component={PatientVisitsList as any} options={{ title: 'Patient Visits' }} />
             <Stack.Screen name="SymptomTrends" component={SymptomTrendsScreen as any} options={{ title: 'Symptom Trends' }} />
@@ -48,7 +51,7 @@ export default function AshaStack() {
             <Stack.Screen name="Profile" component={ProfileScreen as any} options={{ title: 'Profile' }} />
             <Stack.Screen name="PatientEntry" component={PatientEntryScreen as any} options={{ title: 'Patient Entry' }} />
             <Stack.Screen name="MLSymptoms" component={MLSymptomsScreen as any} options={{ title: 'AI Diagnosis' }} />
-            <Stack.Screen name="Settings" component={SettingsScreen as any} options={{ title: 'Settings' }} />
+            <Stack.Screen name="Settings" component={SettingsScreen as any} options={{ headerShown: false }} />
             <Stack.Screen name="Logout" component={LogoutScreen as any} options={{ title: 'Account', animation: 'slide_from_bottom' }} />
         </Stack.Navigator>
     );
