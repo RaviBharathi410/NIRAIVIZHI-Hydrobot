@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MotiView, AnimatePresence } from 'moti';
 import { COLORS, FONTS, GRADIENTS, SPACE } from '../../constants/theme';
-import useBluetoothMock from '../../hooks/useBluetoothMock';
+import { useRobotStore } from '../../store/useRobotStore';
 import AlertSystem from '../../services/AlertSystem';
 import GlassCard from '../../components/GlassCard';
 import RingGauge from '../../components/RingGauge';
@@ -18,9 +18,14 @@ import { OptimusXStackParamList } from '../../navigation/OptimusXStack';
 type Props = NativeStackScreenProps<OptimusXStackParamList, 'TDSTesting'>;
 
 export default function TDSTestingScreen({ }: Props) {
-    const { isConnected, isScanning, sensorData, scan, connect, disconnect } = useBluetoothMock();
+    const { robots, selectedRobotId, connectionStatus } = useRobotStore();
+    const robot = robots.find(r => r.id === selectedRobotId) || robots[0];
+    const tdsValue = robot?.telemetry.tds || 0;
+
     const [history, setHistory] = useState<number[]>([]);
     const [initializing, setInitializing] = useState(true);
+
+    const isConnected = connectionStatus === 'CONNECTED' && robot?.status === 'ONLINE';
 
     useEffect(() => {
         const timer = setTimeout(() => setInitializing(false), 800);
@@ -28,12 +33,13 @@ export default function TDSTestingScreen({ }: Props) {
     }, []);
 
     useEffect(() => {
-        if (sensorData) {
-            setHistory(prev => [...prev.slice(-11), sensorData.tds]);
+        if (isConnected) {
+            setHistory(prev => [...prev.slice(-11), tdsValue]);
         }
-    }, [sensorData]);
+    }, [tdsValue, isConnected]);
 
-    const status = sensorData ? AlertSystem.getWaterStatus('tds', sensorData.tds) : 'unknown';
+    const status = isConnected ? AlertSystem.getWaterStatus('tds', tdsValue) : 'unknown';
+
     const statusColor = status === 'safe' ? COLORS.success : status === 'moderate' ? COLORS.warning : COLORS.danger;
 
     if (initializing) {
@@ -62,14 +68,15 @@ export default function TDSTestingScreen({ }: Props) {
 
                 <SensorConnectionButton
                     isConnected={isConnected}
-                    isScanning={isScanning}
-                    onConnect={() => { scan(); setTimeout(() => connect('AG-SENSOR-001'), 2500); }}
-                    onDisconnect={disconnect}
+                    isScanning={false}
+                    onConnect={() => { }} // Store handles connection
+                    onDisconnect={() => { }}
                 />
 
                 <AnimatePresence>
-                    {sensorData ? (
+                    {isConnected ? (
                         <MotiView
+                            key="data-view"
                             from={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ type: 'spring' } as any}
@@ -77,12 +84,12 @@ export default function TDSTestingScreen({ }: Props) {
                             <GlassCard style={styles.gaugeCard} variant="heavy">
                                 <View style={styles.gaugeHeader}>
                                     <View style={[styles.statusLine, { backgroundColor: statusColor }]} />
-                                    <Text style={styles.gaugeTitle}>Live Reading</Text>
+                                    <Text style={styles.gaugeTitle}>Robot Probe Reading</Text>
                                     <Text style={[styles.statusText, { color: statusColor }]}>{status.toUpperCase()}</Text>
                                 </View>
 
                                 <RingGauge
-                                    value={sensorData.tds}
+                                    value={tdsValue}
                                     maxValue={800}
                                     size={180}
                                     strokeWidth={16}
@@ -92,12 +99,12 @@ export default function TDSTestingScreen({ }: Props) {
 
                                 <View style={styles.infoGrid}>
                                     <View style={styles.infoItem}>
-                                        <Text style={styles.infoLabel}>STABILITY</Text>
-                                        <Text style={styles.infoValue}>High</Text>
+                                        <Text style={styles.infoLabel}>SIGNAL</Text>
+                                        <Text style={styles.infoValue}>Strong</Text>
                                     </View>
                                     <View style={styles.infoItem}>
-                                        <Text style={styles.infoLabel}>ACCURACY</Text>
-                                        <Text style={styles.infoValue}>±2%</Text>
+                                        <Text style={styles.infoLabel}>LATENCY</Text>
+                                        <Text style={styles.infoValue}>42ms</Text>
                                     </View>
                                 </View>
                             </GlassCard>
@@ -139,18 +146,20 @@ export default function TDSTestingScreen({ }: Props) {
                                 </GlassCard>
                             )}
                         </MotiView>
-                    ) : !isScanning ? (
+                    ) : (
                         <MotiView
+                            key="offline-view"
                             from={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             style={styles.emptyContainer}
                         >
-                            <IconBadge icon="bluetooth-off" size={80} color={COLORS.textMuted} />
-                            <Text style={styles.emptyTitle}>Sensor Offline</Text>
-                            <Text style={styles.emptySub}>Please enable Bluetooth and connect a compatible probe to view live diagnostics.</Text>
+                            <IconBadge icon="robot-off" size={80} color={COLORS.textMuted} />
+                            <Text style={styles.emptyTitle}>Robot Link Offline</Text>
+                            <Text style={styles.emptySub}>The primary data link to {robot?.name || 'the robot'} is currently down. Please check connection settings.</Text>
                         </MotiView>
-                    ) : null}
+                    )}
                 </AnimatePresence>
+
             </ScrollView>
         </View>
     );

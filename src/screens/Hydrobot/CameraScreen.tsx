@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { Camera, useCameraDevice, useCameraPermission } from 'react-native-vision-camera';
 import { Canvas, Rect } from '@shopify/react-native-skia';
@@ -7,6 +7,8 @@ import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme/restyleTheme';
 import Text from '../../components/atoms/Text';
 import GlassCard from '../../components/GlassCard';
+import { useRobotStore } from '../../store/useRobotStore';
+
 
 interface Detection {
     id: string;
@@ -19,32 +21,26 @@ export function CameraScreen() {
     const theme = useTheme<Theme>();
     const { hasPermission, requestPermission } = useCameraPermission();
     const device = useCameraDevice('back');
-    const [detections, setDetections] = useState<Detection[]>([]);
+    const { detections: storeDetections } = useRobotStore();
+
+    // Map store detections to screen format and filter those with boxes (for camera overlay)
+    const detections = useMemo(() => {
+        return storeDetections
+            .filter(d => d.box)
+            .map(d => ({
+                id: d.id,
+                label: d.type,
+                box: d.box!,
+                confidence: d.confidence
+            }));
+    }, [storeDetections]);
 
     useEffect(() => {
         if (!hasPermission) {
             requestPermission();
         }
-
-        // Mock detection loop
-        const interval = setInterval(() => {
-            const types = ['Plastic Bottle', 'Bio-waste', 'Metallic Can'];
-            const mockDetections: Detection[] = Array.from({ length: Math.floor(Math.random() * 3) }, (_, i) => ({
-                id: Math.random().toString(),
-                label: types[Math.floor(Math.random() * types.length)],
-                box: {
-                    x: Math.random() * (Dimensions.get('window').width - 100),
-                    y: Math.random() * (Dimensions.get('window').height - 200),
-                    w: 80 + Math.random() * 100,
-                    h: 80 + Math.random() * 100
-                },
-                confidence: 0.7 + Math.random() * 0.25
-            }));
-            setDetections(mockDetections);
-        }, 1000);
-
-        return () => clearInterval(interval);
     }, [hasPermission]);
+
 
     if (!hasPermission) return <View style={styles.container}><Text>No access to camera</Text></View>;
     if (!device) return <View style={styles.container}><Text>No camera device found</Text></View>;

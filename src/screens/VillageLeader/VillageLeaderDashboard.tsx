@@ -9,11 +9,24 @@ import SectionHeader from '../../components/SectionHeader';
 import IconBadge from '../../components/IconBadge';
 import AnimatedButton from '../../components/AnimatedButton';
 import ScreenHeader from '../../components/ScreenHeader';
+import { useRobotStore } from '../../store/useRobotStore';
+import { useAlertStore } from '../../store/useAlertStore';
 
 import { useLanguage } from '../../context/LanguageContext';
 
 export default function VillageLeaderDashboard({ navigation }: any) {
     const { t } = useLanguage();
+    const robots = useRobotStore(state => state.robots);
+    const missionStats = useRobotStore(state => state.missionStats);
+    const alerts = useAlertStore(state => state.alerts);
+
+    const onlineBots = robots.filter(r => r.status === 'ONLINE').length;
+    const recentAlert = alerts[0];
+
+    // Derived resource metrics
+    const totalBatteryUsed = robots.reduce((acc, r) => acc + (100 - r.battery), 0);
+    const energyCost = (totalBatteryUsed * 0.15).toFixed(1); // Mock kwh calculation
+
     return (
         <View style={styles.container}>
             <LinearGradient colors={GRADIENTS.screen as any} style={StyleSheet.absoluteFill} />
@@ -29,7 +42,7 @@ export default function VillageLeaderDashboard({ navigation }: any) {
                 <View style={styles.summaryGrid}>
                     <GlassCard style={styles.summaryCard}>
                         <IconBadge icon="robot-industrial" size={32} color={COLORS.primary} />
-                        <Text style={styles.sVal}>12</Text>
+                        <Text style={styles.sVal}>{onlineBots}</Text>
                         <Text style={styles.sLabel}>{t('botsActive')}</Text>
                     </GlassCard>
                     <GlassCard style={styles.summaryCard}>
@@ -42,30 +55,42 @@ export default function VillageLeaderDashboard({ navigation }: any) {
                 <SectionHeader title={t('recentAlerts')} />
                 <GlassCard style={styles.alertCard} variant="elevated">
                     <View style={styles.alertRow}>
-                        <MaterialCommunityIcons name="alert-octagon" size={32} color={COLORS.danger} />
+                        <MaterialCommunityIcons
+                            name={recentAlert?.severity === 'critical' ? 'alert-octagon' : 'alert-circle'}
+                            size={32}
+                            color={recentAlert?.severity === 'critical' ? COLORS.danger : COLORS.warning}
+                        />
                         <View style={styles.alertInfo}>
-                            <Text style={styles.alertTitle}>Sedimentation Warning</Text>
-                            <Text style={styles.alertDesc}>High turbidity detected near Sector 2. Review automated bot rerouting logs.</Text>
+                            <Text style={[styles.alertTitle, recentAlert?.severity !== 'critical' && { color: COLORS.warning }]}>
+                                {recentAlert?.title || 'System Stable'}
+                            </Text>
+                            <Text style={styles.alertDesc}>
+                                {recentAlert?.message || 'All HydroBots are operating within standard parameters. No active threats detected.'}
+                            </Text>
                         </View>
                     </View>
-                    <AnimatedButton title={t('seeAll')} variant="primary" style={[styles.alertBtn, { backgroundColor: COLORS.danger }]} />
+                    <AnimatedButton
+                        title={t('seeAll')}
+                        variant="outline"
+                        style={styles.alertBtn}
+                        onPress={() => navigation.navigate('Settings')}
+                    />
                 </GlassCard>
 
                 <SectionHeader title="Resource Allocation" />
                 <GlassCard>
                     <View style={styles.resourceRow}>
                         <View style={styles.resItem}>
-                            <Text style={styles.resLabel}>Budget Used</Text>
-                            <Text style={styles.resVal}>₹42.5k</Text>
+                            <Text style={styles.resLabel}>Fleet Range</Text>
+                            <Text style={styles.resVal}>{missionStats.totalDistance} km</Text>
                         </View>
                         <View style={styles.resDivider} />
                         <View style={styles.resItem}>
                             <Text style={styles.resLabel}>Energy Cost</Text>
-                            <Text style={styles.resVal}>84 kWh</Text>
+                            <Text style={styles.resVal}>{energyCost} kWh</Text>
                         </View>
                     </View>
                 </GlassCard>
-
 
             </ScrollView>
         </View>

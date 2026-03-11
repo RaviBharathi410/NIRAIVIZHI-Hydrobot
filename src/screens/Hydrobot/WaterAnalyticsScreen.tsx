@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Pressable } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useRobotStore } from '../../store/useRobotStore';
@@ -16,11 +16,18 @@ import { calcPollutionIndex, getPollutionSeverity } from '../../utils/pollutionI
 
 export function WaterAnalyticsScreen() {
     const theme = useTheme<Theme>();
-    const { robots, selectedRobotId } = useRobotStore();
+    const { robots, selectedRobotId, fetchRobotHistory } = useRobotStore();
     const sensorStore = useSensorStore();
     const [range, setRange] = useState<TimeRange>('24H');
 
     const robot = robots.find(r => r.id === selectedRobotId) || robots[0];
+
+    // Fetch history on mount or when selection changes
+    useEffect(() => {
+        if (robot) {
+            fetchRobotHistory(robot.id);
+        }
+    }, [robot?.id, range]);
 
     // Calculate live pollution index
     const pollutionData = useMemo(() => {
@@ -34,29 +41,23 @@ export function WaterAnalyticsScreen() {
         return { index, severity: getPollutionSeverity(index) };
     }, [robot]);
 
-    // Mock history data based on time range
-    const getPoints = (r: TimeRange) => {
-        switch (r) {
-            case '1H': return 12;
-            case '6H': return 24;
-            case '24H': return 48;
-            case '7D': return 60;
-        }
-    };
+    // Extract data for charts from history
+    const sensorHistory = useMemo(() => {
+        if (!robot?.history || robot.history.length === 0) return { ph: [], tds: [], turbidity: [], temp: [] };
 
-    const generateMockData = (base: number, variance: number) => {
-        const points = getPoints(range);
-        const timeSpan = range === '1H' ? 3600000 : range === '6H' ? 21600000 : range === '24H' ? 86400000 : 604800000;
-        return Array.from({ length: points }, (_, i) => ({
-            timestamp: Date.now() - (points - i) * (timeSpan / points),
-            value: base + (Math.random() - 0.5) * variance
-        }));
-    };
+        return {
+            ph: robot.history.map((h: any) => ({ timestamp: h.timestamp, value: h.ph })),
+            tds: robot.history.map((h: any) => ({ timestamp: h.timestamp, value: h.tds })),
+            turbidity: robot.history.map((h: any) => ({ timestamp: h.timestamp, value: h.turbidity })),
+            temp: robot.history.map((h: any) => ({ timestamp: h.timestamp, value: h.temp })),
+        };
+    }, [robot?.history]);
 
-    const phData = generateMockData(robot?.telemetry.ph || 7.2, 0.5);
-    const tdsData = generateMockData(robot?.telemetry.tds || 250, 40);
-    const turbidData = generateMockData(robot?.telemetry.turbidity || 45, 10);
-    const tempData = generateMockData(robot?.telemetry.temp || 28, 2);
+    const phData = sensorHistory.ph;
+    const tdsData = sensorHistory.tds;
+    const turbidData = sensorHistory.turbidity;
+    const tempData = sensorHistory.temp;
+
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background as string }]}>

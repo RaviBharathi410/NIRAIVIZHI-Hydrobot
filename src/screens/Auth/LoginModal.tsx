@@ -19,7 +19,7 @@ interface LoginModalProps {
 
 export default function LoginModal({ navigation, route }: LoginModalProps) {
     const { role = ROLES.OPTIMUS_X } = route?.params || {};
-    const { login } = useAuth();
+    const { login, bypassLogin } = useAuth();
 
     // Auto-fill credentials based on role for easy demo/testing
     const getInitialCreds = (r: string) => {
@@ -127,6 +127,13 @@ export default function LoginModal({ navigation, route }: LoginModalProps) {
                             style={[styles.submitBtn, { backgroundColor: ROLE_COLORS[roleKey] }]}
                             iconRight="login"
                         />
+
+                        <TouchableOpacity
+                            onPress={() => bypassLogin(role)}
+                            style={{ marginTop: 15, padding: 10, alignItems: 'center', borderStyle: 'dashed', borderWidth: 1, borderColor: COLORS.textMuted, borderRadius: 8 }}
+                        >
+                            <Text style={{ color: COLORS.textMuted, fontSize: 10, fontWeight: '700' }}>DEVELOPER BYPASS (UI ONLY)</Text>
+                        </TouchableOpacity>
 
                         <TouchableOpacity
                             onPress={() => navigation.goBack()}

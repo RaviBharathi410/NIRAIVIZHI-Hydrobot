@@ -11,7 +11,9 @@ class SocketService {
 
         this.socket = io(SOCKET_URL, {
             transports: ['websocket'],
-            reconnectionAttempts: 5,
+            reconnectionAttempts: 3,
+            reconnectionDelay: 3000,
+            timeout: 5000,
         });
 
         const store = useRobotStore.getState();
@@ -27,7 +29,7 @@ class SocketService {
         });
 
         this.socket.on('connect_error', (error) => {
-            console.error('Bridge Connection Error:', error);
+            console.warn('[Socket] Backend offline — operating in offline mode:', error.message);
             store.setConnectionStatus('ERROR');
         });
 
@@ -68,11 +70,12 @@ class SocketService {
         });
     }
 
-    sendCommand(robotId: string, command: any) {
+    sendRobotCommand(robotId: string, command: any) {
         if (this.socket?.connected) {
             this.socket.emit('robot_command', { robotId, ...command });
         }
     }
+
 
     disconnect() {
         if (this.socket) {

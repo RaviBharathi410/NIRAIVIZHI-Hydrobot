@@ -9,6 +9,7 @@ import Text from '../atoms/Text';
 interface DataPoint {
     timestamp: number;
     value: number;
+    [key: string]: number;
 }
 
 interface SensorLineChartProps {

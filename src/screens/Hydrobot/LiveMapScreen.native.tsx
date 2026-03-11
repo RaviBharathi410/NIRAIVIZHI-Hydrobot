@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, SafeAreaView, Dimensions, Platform } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE, Polygon } from 'react-native-maps';
-import { useRobotStore } from '../../store/useRobotStore';
+import MapView, { Marker, PROVIDER_GOOGLE, Polygon, Polyline } from 'react-native-maps';
+import { useRobotStore, Robot } from '../../store/useRobotStore';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme/restyleTheme';
 import Text from '../../components/atoms/Text';
@@ -18,8 +18,8 @@ export function LiveMapScreen() {
     const selectedRobot = robots.find(r => r.id === selectedRobotId) || robots[0];
 
     const initialRegion = {
-        latitude: selectedRobot?.location.latitude || 12.9716,
-        longitude: selectedRobot?.location.longitude || 77.5946,
+        latitude: selectedRobot?.telemetry.location.latitude || 12.9716,
+        longitude: selectedRobot?.telemetry.location.longitude || 77.5946,
         latitudeDelta: 0.01,
         longitudeDelta: 0.01,
     };
@@ -41,13 +41,24 @@ export function LiveMapScreen() {
                     showsUserLocation
                 >
                     {robots.map(robot => (
-                        <Marker
-                            key={robot.id}
-                            coordinate={robot.location}
-                            onPress={() => setSelectedRobot(robot.id)}
-                        >
-                            <PulseMarker color={robot.isOnline ? '#00E5FF' : '#94A3B8'} />
-                        </Marker>
+                        <React.Fragment key={robot.id}>
+                            {/* Cleaned Path (Trajectory) */}
+                            {robot.path && robot.path.length > 1 && (
+                                <Polyline
+                                    coordinates={robot.path}
+                                    strokeColor={robot.status === 'ONLINE' ? '#00E5FF80' : '#94A3B880'}
+                                    strokeWidth={20} // Thick to represent cleaned area
+                                    lineCap="round"
+                                />
+                            )}
+
+                            <Marker
+                                coordinate={robot.telemetry.location}
+                                onPress={() => setSelectedRobot(robot.id)}
+                            >
+                                <PulseMarker color={robot.status === 'ONLINE' ? '#00E5FF' : '#94A3B8'} />
+                            </Marker>
+                        </React.Fragment>
                     ))}
 
                     {detections.map(det => (
@@ -70,7 +81,9 @@ export function LiveMapScreen() {
                             <MaterialCommunityIcons name="satellite-variant" size={24} color="#00E5FF" />
                             <View style={{ marginLeft: 12 }}>
                                 <Text variant="body" style={{ fontWeight: '700', color: 'white' }}>FLEET TRACKING</Text>
-                                <Text variant="caption" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>{robots.filter(r => r.isOnline).length} Active Units</Text>
+                                <Text variant="caption" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                    {robots.filter(r => r.status === 'ONLINE').length} Active Units
+                                </Text>
                             </View>
                         </View>
                         <HeaderActions />
@@ -82,7 +95,7 @@ export function LiveMapScreen() {
                 <View style={[styles.bottomSheet, { backgroundColor: theme.colors.surface as string }]}>
                     <View style={styles.sheetHeader}>
                         <Text variant="subheading">{selectedRobot.name}</Text>
-                        <Text variant="caption" color="primary">{selectedRobot.missionStatus}</Text>
+                        <Text variant="caption" color="primary">{selectedRobot.status}</Text>
                     </View>
                     <View style={styles.sheetStats}>
                         <MapStat label="BATT" value={`${selectedRobot.battery}%`} icon="battery-80" />
@@ -91,6 +104,7 @@ export function LiveMapScreen() {
                     </View>
                 </View>
             )}
+
         </View>
     );
 }

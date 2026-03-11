@@ -1,45 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { COLORS, FONTS, SPACE } from '../constants/theme';
-import telemetryService from '../services/telemetryService';
+import { useRobotStore } from '../store/useRobotStore';
 import StatusCard from './StatusCard';
-import AlertSystem from '../services/AlertSystem';
 
 export default function WaterQualityHUD() {
-    const [data, setData] = useState({
-        ph: '--',
-        tds: '--',
-        turbidity: '--',
-        temp: '--',
-        timestamp: null as string | null
-    });
+    const { robots, selectedRobotId, connectionStatus } = useRobotStore();
+    const robot = robots.find(r => r.id === selectedRobotId) || robots[0];
 
-    const [connected, setConnected] = useState(false);
+    const isConnected = connectionStatus === 'CONNECTED' && robot?.status === 'ONLINE';
 
-    useEffect(() => {
-        telemetryService.connect();
-        setConnected(true);
+    const getStatus = (type: string, val: any): 'safe' | 'moderate' | 'unsafe' | 'default' => {
+        if (val === undefined || val === null || val === '--') return 'default';
+        const num = parseFloat(val);
 
-        const unsubscribe = telemetryService.subscribe((newData: any) => {
-            setData(newData);
-        });
-
-        return () => {
-            unsubscribe();
-            telemetryService.disconnect();
-        };
-    }, []);
-
-    const getStatus = (type: string, val: string): 'safe' | 'moderate' | 'unsafe' | 'default' => {
-        if (val === '--') return 'default';
-        return AlertSystem.getWaterStatus(type as 'ph' | 'tds' | 'turbidity', parseFloat(val)) as 'safe' | 'moderate' | 'unsafe' | 'default';
+        // Simple logic mirroring AlertSystem but integrated
+        if (type === 'ph') {
+            if (num >= 6.5 && num <= 8.5) return 'safe';
+            if (num < 6.0 || num > 9.0) return 'unsafe';
+            return 'moderate';
+        }
+        if (type === 'tds') {
+            if (num < 300) return 'safe';
+            if (num > 600) return 'unsafe';
+            return 'moderate';
+        }
+        if (type === 'turbid') {
+            if (num < 5) return 'safe';
+            if (num > 15) return 'unsafe';
+            return 'moderate';
+        }
+        return 'default';
     };
+
+    const telemetry = robot?.telemetry || { ph: 0, tds: 0, turbidity: 0, temp: 0 };
+
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <View style={[styles.pulse, { backgroundColor: connected ? COLORS.success : COLORS.danger }]} />
-                <Text style={styles.liveText}>{connected ? 'LIVE TELEMETRY' : 'DISCONNECTED'}</Text>
+                <View style={[styles.pulse, { backgroundColor: isConnected ? COLORS.success : COLORS.danger }]} />
+                <Text style={styles.liveText}>{isConnected ? 'LIVE TELEMETRY' : 'OFFLINE / DISCONNECTED'}</Text>
             </View>
 
             <ScrollView
@@ -49,34 +50,35 @@ export default function WaterQualityHUD() {
             >
                 <StatusCard
                     title="pH LEVEL"
-                    value={data.ph}
+                    value={telemetry.ph.toFixed(1)}
                     unit="pH"
-                    status={getStatus('ph', data.ph)}
+                    status={getStatus('ph', telemetry.ph)}
                     icon="🧪"
                 />
                 <StatusCard
                     title="TDS SENSOR"
-                    value={data.tds}
+                    value={telemetry.tds.toString()}
                     unit="ppm"
-                    status={getStatus('tds', data.tds)}
+                    status={getStatus('tds', telemetry.tds)}
                     icon="💧"
                 />
                 <StatusCard
                     title="TURBIDITY"
-                    value={data.turbidity}
+                    value={telemetry.turbidity.toString()}
                     unit="NTU"
-                    status={getStatus('turbidity', data.turbidity)}
+                    status={getStatus('turbid', telemetry.turbidity)}
                     icon="🌊"
                 />
                 <StatusCard
                     title="TEMPERATURE"
-                    value={data.temp}
+                    value={telemetry.temp.toFixed(1)}
                     unit="°C"
                     status="info"
                     icon="🌡️"
                 />
             </ScrollView>
         </View>
+
     );
 }
 

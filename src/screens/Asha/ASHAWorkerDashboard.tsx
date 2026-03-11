@@ -10,11 +10,20 @@ import SectionHeader from '../../components/SectionHeader';
 import AnimatedButton from '../../components/AnimatedButton';
 import SkeletonLoader from '../../components/SkeletonLoader';
 import { useLanguage } from '../../context/LanguageContext';
+import { useRobotStore } from '../../store/useRobotStore';
+import { useAlertStore } from '../../store/useAlertStore';
 
 export default function ASHAWorkerDashboard({ navigation }: any) {
     const { t } = useLanguage();
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
+
+    const missionStats = useRobotStore(state => state.missionStats);
+    const alerts = useAlertStore(state => state.alerts);
+    const unreadAlertsCount = useAlertStore(state => state.unreadCount());
+
+    // Get the most recent critical/warning alert for Intelligence feed
+    const latestCrisis = alerts.find(a => a.severity === 'critical' || a.severity === 'warning') || alerts[0];
 
     useEffect(() => {
         const timer = setTimeout(() => setLoading(false), 800);
@@ -71,7 +80,7 @@ export default function ASHAWorkerDashboard({ navigation }: any) {
                     <GlassCard style={styles.mainStats} variant="heavy">
                         <View style={styles.statsRow}>
                             <View style={styles.statItem}>
-                                <Text style={styles.statVal}>24</Text>
+                                <Text style={styles.statVal}>{Math.floor(missionStats.totalTrash / 2)}</Text>
                                 <Text style={styles.statLabel}>{t('testsDone') || 'TESTS'}</Text>
                             </View>
                             <View style={styles.statDivider} />
@@ -81,7 +90,9 @@ export default function ASHAWorkerDashboard({ navigation }: any) {
                             </View>
                             <View style={styles.statDivider} />
                             <View style={styles.statItem}>
-                                <Text style={[styles.statVal, { color: COLORS.danger }]}>3</Text>
+                                <Text style={[styles.statVal, { color: unreadAlertsCount > 0 ? COLORS.danger : COLORS.text }]}>
+                                    {unreadAlertsCount}
+                                </Text>
                                 <Text style={styles.statLabel}>{t('activeAlerts') || 'ALERTS'}</Text>
                             </View>
                         </View>
@@ -115,23 +126,34 @@ export default function ASHAWorkerDashboard({ navigation }: any) {
                     <SectionHeader title={t('intelligence') || 'Sector Intelligence'} />
                     <GlassCard style={styles.intelligenceCard} variant="heavy">
                         <View style={styles.intelHeader}>
-                            <View style={[styles.intelIcon, { backgroundColor: COLORS.warning + '20' }]}>
-                                <MaterialCommunityIcons name="molecule" size={24} color={COLORS.warning} />
+                            <View style={[styles.intelIcon, { backgroundColor: (latestCrisis?.severity === 'critical' ? COLORS.danger : COLORS.warning) + '20' }]}>
+                                <MaterialCommunityIcons
+                                    name={latestCrisis?.severity === 'critical' ? "alert-decagram" : "molecule"}
+                                    size={24}
+                                    color={latestCrisis?.severity === 'critical' ? COLORS.danger : COLORS.warning}
+                                />
                             </View>
                             <View style={styles.intelHeaderText}>
-                                <Text style={styles.intelTitle}>Sector 4 - Bacterial Spike</Text>
-                                <Text style={styles.intelTime}>24h Activity</Text>
+                                <Text style={[styles.intelTitle, latestCrisis?.severity === 'critical' && { color: COLORS.danger }]}>
+                                    {latestCrisis?.title || "Operational Stability"}
+                                </Text>
+                                <Text style={styles.intelTime}>
+                                    {latestCrisis ? 'Active Alert' : 'System Normal'}
+                                </Text>
                             </View>
                         </View>
                         <Text style={styles.intelSub}>
-                            3 cases of water-borne symptoms reported in the last 24h. Regional data suggests a correlation with recent pipeline maintenance.
+                            {latestCrisis?.message || "No significant health anomalies detected in your sector. All automated systems reporting within safe parameters."}
                         </Text>
                         <View style={styles.intelActions}>
                             <TouchableOpacity style={styles.intelActionBtn}>
                                 <MaterialCommunityIcons name="share-variant-outline" size={20} color={COLORS.primary} />
                                 <Text style={styles.intelActionText}>Share with Official</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={[styles.intelActionBtn, styles.intelActionBtnPrimary]}>
+                            <TouchableOpacity
+                                style={[styles.intelActionBtn, styles.intelActionBtnPrimary]}
+                                onPress={() => navigation.navigate('SymptomTrends')}
+                            >
                                 <Text style={[styles.intelActionText, { color: 'white' }]}>Run Deep Analysis</Text>
                             </TouchableOpacity>
                         </View>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MotiView } from 'moti';
@@ -7,17 +7,24 @@ import { COLORS, FONTS, GRADIENTS, SPACE } from '../../constants/theme';
 import GlassCard from '../../components/GlassCard';
 import SectionHeader from '../../components/SectionHeader';
 import RingGauge from '../../components/RingGauge';
+import { useRobotStore } from '../../store/useRobotStore';
 
 export default function FloodRiskAlertScreen() {
-    const [riskLevel] = useState(25); // 0-100
+    const { robots, selectedRobotId, connectionStatus } = useRobotStore();
+    const robot = robots.find(r => r.id === selectedRobotId) || robots[0];
+    const floodRisk = robot?.telemetry.floodRisk || { index: 0, waterLevel: 0, flowRate: 0 };
+    const riskLevel = floodRisk.index;
+    const isConnected = connectionStatus === 'CONNECTED' && robot?.status === 'ONLINE';
 
     const getRiskStatus = () => {
+        if (!isConnected) return { label: 'UNKNOWN', color: COLORS.textMuted, icon: 'help-circle' as const };
         if (riskLevel < 35) return { label: 'LOW', color: COLORS.success, icon: 'check-circle' as const };
         if (riskLevel < 70) return { label: 'MODERATE', color: COLORS.warning, icon: 'alert-circle' as const };
         return { label: 'CRITICAL', color: COLORS.danger, icon: 'alert-octagon' as const };
     };
 
     const status = getRiskStatus();
+
 
     return (
         <View style={styles.container}>
@@ -53,14 +60,15 @@ export default function FloodRiskAlertScreen() {
                 <SectionHeader title="Sensor Diagnostics" />
                 <View style={styles.grid}>
                     <GlassCard style={styles.gridItem}>
-                        <Text style={styles.gVal}>4.2m</Text>
+                        <Text style={styles.gVal}>{floodRisk.waterLevel.toFixed(1)}m</Text>
                         <Text style={styles.gLabel}>Water Level</Text>
                     </GlassCard>
                     <GlassCard style={styles.gridItem}>
-                        <Text style={styles.gVal}>128m³/s</Text>
+                        <Text style={styles.gVal}>{floodRisk.flowRate}m³/s</Text>
                         <Text style={styles.gLabel}>Current Flow</Text>
                     </GlassCard>
                 </View>
+
 
                 <SectionHeader title="Precipitation Forecast" />
                 <GlassCard>

@@ -7,7 +7,7 @@ import { COLORS, FONTS, GRADIENTS, SPACE } from '../../constants/theme';
 import GlassCard from '../../components/GlassCard';
 import SectionHeader from '../../components/SectionHeader';
 import ScreenHeader from '../../components/ScreenHeader';
-import { CartesianChart, Line, Area } from 'victory-native';
+import WebLineChart from '../../components/charts/WebLineChart';
 
 const CORRELATION_DATA = [
     { hour: '00', ph: 7.2, symptoms: 2 },
@@ -53,40 +53,15 @@ export default function RegionalAnalyticsScreen() {
                             </View>
                         </View>
 
-                        <View style={styles.victoryWrapper}>
-                            <CartesianChart
-                                data={CORRELATION_DATA}
-                                xKey="hour"
-                                yKeys={["symptoms", "ph"]}
-                                axisOptions={{
-                                    font: null as any,
-                                    labelColor: COLORS.textMuted,
-                                    lineColor: 'rgba(255,255,255,0.05)',
-                                }}
-                            >
-                                {({ points }) => (
-                                    <>
-                                        <Area
-                                            points={points.symptoms}
-                                            y0={0}
-                                            color={COLORS.danger + '30'}
-                                        />
-                                        <Line
-                                            points={points.symptoms}
-                                            color={COLORS.danger}
-                                            strokeWidth={3}
-                                            curveType="monotoneX"
-                                        />
-                                        <Line
-                                            points={points.ph.map(p => ({ ...p, y: p.y * 5 }))} // Scaled for visualization
-                                            color={COLORS.info}
-                                            strokeWidth={2}
-                                            curveType="monotoneX"
-                                        />
-                                    </>
-                                )}
-                            </CartesianChart>
-                        </View>
+                        <WebLineChart
+                            data={CORRELATION_DATA}
+                            xKey="hour"
+                            lines={[
+                                { key: 'symptoms', color: COLORS.danger, strokeWidth: 3, filled: true },
+                                { key: 'ph', color: COLORS.info, strokeWidth: 2 },
+                            ]}
+                            height={220}
+                        />
                         <Text style={styles.chartNote}>
                             * pH values scaled 5x for visual alignment with caseload metrics.
                         </Text>

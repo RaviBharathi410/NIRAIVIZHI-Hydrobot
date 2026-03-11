@@ -30,7 +30,11 @@ export function HydrobotNavigator() {
             screenOptions={({ route }) => ({
                 headerShown: true,
                 headerTintColor: theme.colors.text as string,
-                headerTitleStyle: { ...theme.textVariants.heading, fontSize: 20 },
+                headerTitleStyle: {
+                    fontSize: 20,
+                    fontWeight: theme.textVariants.heading.fontWeight as any,
+                    color: theme.colors.text as string
+                },
                 headerRight: () => <HeaderActions />,
                 headerTitle: route.name === 'Fleet' ? 'NIRAIVIZHI' : route.name,
                 headerStyle: {

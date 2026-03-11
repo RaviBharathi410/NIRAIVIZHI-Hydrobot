@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MotiView } from 'moti';
@@ -7,13 +7,27 @@ import { COLORS, FONTS, GRADIENTS, SPACE } from '../../constants/theme';
 import GlassCard from '../../components/GlassCard';
 import SectionHeader from '../../components/SectionHeader';
 import AnimatedButton from '../../components/AnimatedButton';
+import { useRobotStore } from '../../store/useRobotStore';
 
 const { width } = Dimensions.get('window');
 
 export default function DualConveyorControlScreen() {
-    const [c1Speed, setC1Speed] = useState(65);
-    const [c2Speed, setC2Speed] = useState(40);
-    const [isActive, setIsActive] = useState(true);
+    const { robots, selectedRobotId, setConveyorSpeed, connectionStatus } = useRobotStore();
+    const robot = robots.find(r => r.id === selectedRobotId) || robots[0];
+    const conveyors = robot?.telemetry.conveyors || { belt1: 0, belt2: 0 };
+    const isConnected = connectionStatus === 'CONNECTED' && robot?.status === 'ONLINE';
+
+    const c1Speed = conveyors.belt1;
+    const c2Speed = conveyors.belt2;
+    const isActive = isConnected && (c1Speed > 0 || c2Speed > 0);
+
+    const updateSpeed = (belt: 1 | 2, delta: number) => {
+        if (!robot) return;
+        const current = belt === 1 ? c1Speed : c2Speed;
+        const next = Math.min(100, Math.max(0, current + delta));
+        setConveyorSpeed(robot.id, belt, next);
+    };
+
 
     return (
         <View style={styles.container}>
@@ -47,10 +61,18 @@ export default function DualConveyorControlScreen() {
                             <Text style={styles.speedLabel}>VELOCITY</Text>
                         </View>
                         <View style={styles.actionRow}>
-                            <TouchableOpacity onPress={() => setC1Speed(Math.max(0, c1Speed - 10))} style={styles.speedBtn}>
+                            <TouchableOpacity
+                                onPress={() => updateSpeed(1, -10)}
+                                style={[styles.speedBtn, !isConnected && styles.disabledBtn]}
+                                disabled={!isConnected}
+                            >
                                 <MaterialCommunityIcons name="minus" size={24} color={COLORS.white} />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => setC1Speed(Math.min(100, c1Speed + 10))} style={styles.speedBtn}>
+                            <TouchableOpacity
+                                onPress={() => updateSpeed(1, 10)}
+                                style={[styles.speedBtn, !isConnected && styles.disabledBtn]}
+                                disabled={!isConnected}
+                            >
                                 <MaterialCommunityIcons name="plus" size={24} color={COLORS.white} />
                             </TouchableOpacity>
                         </View>
@@ -65,7 +87,7 @@ export default function DualConveyorControlScreen() {
                                 key={i}
                                 from={{ translateX: 0 }}
                                 animate={{ translateX: width * 0.7 }}
-                                transition={{ loop: true, duration: 2000 * (100 / c2Speed), type: 'timing', delay: i * 350 } as any}
+                                transition={{ loop: true, duration: c2Speed > 0 ? 2000 * (100 / c2Speed) : 0, type: 'timing', delay: i * 350 } as any}
                                 style={styles.beltItem}
                             >
                                 <MaterialCommunityIcons name="recycle" size={20} color={COLORS.success} />
@@ -79,10 +101,18 @@ export default function DualConveyorControlScreen() {
                             <Text style={styles.speedLabel}>VELOCITY</Text>
                         </View>
                         <View style={styles.actionRow}>
-                            <TouchableOpacity onPress={() => setC2Speed(Math.max(0, c2Speed - 10))} style={styles.speedBtn}>
+                            <TouchableOpacity
+                                onPress={() => updateSpeed(2, -10)}
+                                style={[styles.speedBtn, !isConnected && styles.disabledBtn]}
+                                disabled={!isConnected}
+                            >
                                 <MaterialCommunityIcons name="minus" size={24} color={COLORS.white} />
                             </TouchableOpacity>
-                            <TouchableOpacity onPress={() => setC2Speed(Math.min(100, c2Speed + 10))} style={styles.speedBtn}>
+                            <TouchableOpacity
+                                onPress={() => updateSpeed(2, 10)}
+                                style={[styles.speedBtn, !isConnected && styles.disabledBtn]}
+                                disabled={!isConnected}
+                            >
                                 <MaterialCommunityIcons name="plus" size={24} color={COLORS.white} />
                             </TouchableOpacity>
                         </View>
@@ -91,13 +121,26 @@ export default function DualConveyorControlScreen() {
 
                 <View style={styles.masterControls}>
                     <AnimatedButton
-                        title={isActive ? "PAUSE LINE" : "RESUME LINE"}
+                        title={isActive ? "EMERGENCY STOP" : "SYSTEM START"}
                         variant={isActive ? "primary" : "outline"}
-                        style={styles.masterBtn}
-                        onPress={() => setIsActive(!isActive)}
-                        icon={isActive ? "pause" : "play"}
+                        style={[styles.masterBtn, isActive && { backgroundColor: COLORS.danger }]}
+                        onPress={() => {
+                            if (isActive) {
+                                setConveyorSpeed(robot.id, 1, 0);
+                                setConveyorSpeed(robot.id, 2, 0);
+                            } else {
+                                setConveyorSpeed(robot.id, 1, 50);
+                                setConveyorSpeed(robot.id, 2, 50);
+                            }
+                        }}
+                        icon={isActive ? "stop" : "play"}
+                        disabled={!isConnected}
                     />
+                    {!isConnected && (
+                        <Text style={styles.offlineWarning}>Robot Link Offline - Controls Restricted</Text>
+                    )}
                 </View>
+
             </ScrollView>
         </View>
     );
@@ -118,6 +161,8 @@ const styles = StyleSheet.create({
     speedLabel: { ...FONTS.bold, fontSize: 10, color: COLORS.textMuted, letterSpacing: 1 },
     actionRow: { flexDirection: 'row' },
     speedBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.1)', justifyContent: 'center', alignItems: 'center', marginLeft: 12 },
+    disabledBtn: { opacity: 0.3 },
     masterControls: { marginTop: 20 },
     masterBtn: { height: 60 },
+    offlineWarning: { ...FONTS.medium, fontSize: 12, color: COLORS.danger, textAlign: 'center', marginTop: 12, letterSpacing: 0.5 },
 });

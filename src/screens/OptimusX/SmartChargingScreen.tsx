@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MotiView, AnimatePresence } from 'moti';
@@ -8,11 +8,17 @@ import GlassCard from '../../components/GlassCard';
 import SectionHeader from '../../components/SectionHeader';
 import IconBadge from '../../components/IconBadge';
 import SimpleChart from '../../components/charts/SimpleChart';
+import { useRobotStore } from '../../store/useRobotStore';
 
 export default function SmartChargingScreen() {
-    const [batteryLevel] = useState(82);
-    const [isCharging] = useState(true);
-    const [solarInput] = useState(45);
+    const { robots, selectedRobotId } = useRobotStore();
+    const robot = robots.find(r => r.id === selectedRobotId) || robots[0];
+
+    const batteryLevel = robot?.battery || 0;
+    const isCharging = robot?.status === 'CHARGING';
+    const voltage = robot?.telemetry.voltage || 0;
+    const solarInput = isCharging ? 45 : 0; // Mock solar input when charging
+
 
     return (
         <View style={styles.container}>
@@ -67,18 +73,19 @@ export default function SmartChargingScreen() {
 
                     <View style={styles.powerStats}>
                         <View style={styles.pItem}>
-                            <Text style={styles.pVal}>3.2 kW</Text>
+                            <Text style={styles.pVal}>{isCharging ? '3.2 kW' : '0.0 kW'}</Text>
                             <Text style={styles.pLabel}>INFLOW</Text>
                         </View>
                         <View style={styles.pItem}>
-                            <Text style={styles.pVal}>45m</Text>
+                            <Text style={styles.pVal}>{isCharging ? `${Math.floor((100 - batteryLevel) * 0.8)}m` : '--'}</Text>
                             <Text style={styles.pLabel}>TO FULL</Text>
                         </View>
                         <View style={styles.pItem}>
-                            <Text style={styles.pVal}>18.4V</Text>
+                            <Text style={styles.pVal}>{voltage.toFixed(1)}V</Text>
                             <Text style={styles.pLabel}>VOLTAGE</Text>
                         </View>
                     </View>
+
                 </GlassCard>
 
                 <SectionHeader title="Power Sources" />

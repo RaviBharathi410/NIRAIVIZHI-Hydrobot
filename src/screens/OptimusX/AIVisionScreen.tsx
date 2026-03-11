@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MotiView } from 'moti';
@@ -8,26 +8,28 @@ import GlassCard from '../../components/GlassCard';
 import SectionHeader from '../../components/SectionHeader';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { OptimusXStackParamList } from '../../navigation/OptimusXStack';
+import { useRobotStore } from '../../store/useRobotStore';
 
-const { height } = Dimensions.get('window');
+const { height, width: SCREEN_WIDTH } = Dimensions.get('window');
 
 type Props = NativeStackScreenProps<OptimusXStackParamList, 'AIVision'>;
 
-interface DetectedObject {
-    id: number;
-    label: string;
-    confidence: number;
-    x: number;
-    y: number;
-    size: number;
-}
-
 export default function AIVisionScreen({ navigation }: Props) {
-    const [objects] = useState<DetectedObject[]>([
-        { id: 1, label: 'Plastic Bottle', confidence: 0.98, x: 40, y: 150, size: 80 },
-        { id: 2, label: 'Algae Bloom', confidence: 0.76, x: 200, y: 300, size: 120 },
-        { id: 3, label: 'Oil Slick', confidence: 0.45, x: 100, y: 450, size: 100 },
-    ]);
+    const { detections } = useRobotStore();
+
+    // Map detections with boxes to the rendering format
+    const objects = detections
+        .filter(d => d.box)
+        .map(d => ({
+            id: d.id,
+            label: d.type,
+            confidence: d.confidence,
+            x: d.box!.x * SCREEN_WIDTH / 100, // Handle normalized coordinates if needed
+            y: d.box!.y * height / 100,
+            w: d.box!.w * SCREEN_WIDTH / 100,
+            h: d.box!.h * height / 100,
+        }));
+
 
     return (
         <View style={styles.container}>
@@ -46,20 +48,27 @@ export default function AIVisionScreen({ navigation }: Props) {
                     style={styles.scanLine}
                 />
 
-                {objects.map((obj, i) => (
+                {objects.slice(0, 10).map((obj, i) => (
                     <MotiView
                         key={obj.id}
                         from={{ opacity: 0, scale: 0.5 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 500 + i * 200, type: 'spring' } as any}
+                        transition={{ delay: i * 50, type: 'spring' } as any}
                         style={[
                             styles.detectionBox,
-                            { top: obj.y, left: obj.x, width: obj.size, height: obj.size, borderColor: obj.confidence > 0.8 ? COLORS.success : COLORS.warning }
+                            {
+                                top: obj.y,
+                                left: obj.x,
+                                width: obj.w,
+                                height: obj.h,
+                                borderColor: obj.confidence > 0.8 ? COLORS.success : COLORS.warning
+                            }
                         ]}
                     >
                         <View style={[styles.labelTag, { backgroundColor: obj.confidence > 0.8 ? COLORS.success : COLORS.warning }]}>
                             <Text style={styles.labelText}>{obj.label} {(obj.confidence * 100).toFixed(0)}%</Text>
                         </View>
+
                         <MotiView
                             from={{ opacity: 0.2 }}
                             animate={{ opacity: 0.5 }}
@@ -82,11 +91,11 @@ export default function AIVisionScreen({ navigation }: Props) {
                 <View style={styles.hudBottom}>
                     <GlassCard style={styles.hudMetrics}>
                         <View style={styles.metricItem}>
-                            <Text style={styles.metricVal}>32</Text>
+                            <Text style={styles.metricVal}>{useRobotStore.getState().aiPerformance.fps}</Text>
                             <Text style={styles.metricLabel}>FPS</Text>
                         </View>
                         <View style={styles.metricItem}>
-                            <Text style={styles.metricVal}>4ms</Text>
+                            <Text style={styles.metricVal}>{useRobotStore.getState().aiPerformance.latency}ms</Text>
                             <Text style={styles.metricLabel}>LATENCY</Text>
                         </View>
                         <View style={styles.metricItem}>

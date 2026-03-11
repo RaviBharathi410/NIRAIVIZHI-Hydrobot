@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MotiView } from 'moti';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, GRADIENTS, SPACE } from '../../constants/theme';
-import apiService from '../../services/api';
 import GlassCard from '../../components/GlassCard';
 import RingGauge from '../../components/RingGauge';
-import SkeletonLoader from '../../components/SkeletonLoader';
 import ScreenHeader from '../../components/ScreenHeader';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { OptimusXStackParamList } from '../../navigation/OptimusXStack';
+import { useRobotStore, Robot } from '../../store/useRobotStore';
 
 type Props = NativeStackScreenProps<OptimusXStackParamList, 'FleetManagement'>;
 
@@ -27,24 +26,17 @@ export interface Bot {
 }
 
 export default function FleetManagementScreen({ navigation }: Props) {
-    const [bots, setBots] = useState<Bot[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { robots } = useRobotStore();
 
-    useEffect(() => {
-        const loadBots = async () => {
-            const data = await apiService.getBotFleet();
-            const formattedBots: Bot[] = data.map((d: any) => ({
-                id: d.id,
-                name: d.name,
-                status: d.status,
-                battery: d.battery,
-                location: { lat: d.lat, lng: d.lng },
-            }));
-            setBots(formattedBots);
-            setLoading(false);
-        };
-        loadBots();
-    }, []);
+    const formattedBots: Bot[] = robots.map((r: Robot) => ({
+        id: r.id,
+        name: r.name,
+        status: r.status === 'ONLINE' ? 'active' : (r.status === 'ERROR' ? 'error' : 'warning'),
+        battery: r.battery,
+        location: { lat: r.telemetry.location.latitude, lng: r.telemetry.location.longitude },
+        load: r.telemetry.pollutionIndex // Using pollutionIndex as a proxy for cargo load
+    }));
+
 
     const renderBotItem = ({ item, index }: { item: Bot, index: number }) => (
         <MotiView
@@ -94,31 +86,18 @@ export default function FleetManagementScreen({ navigation }: Props) {
         </MotiView>
     );
 
-    if (loading) {
-        return (
-            <View style={styles.container}>
-                <LinearGradient colors={GRADIENTS.screen as any} style={StyleSheet.absoluteFill} />
-                <View style={styles.skeletonList}>
-                    <SkeletonLoader height={180} borderRadius={20} style={{ marginBottom: 16 }} />
-                    <SkeletonLoader height={180} borderRadius={20} style={{ marginBottom: 16 }} />
-                    <SkeletonLoader height={180} borderRadius={20} style={{ marginBottom: 16 }} />
-                </View>
-            </View>
-        );
-    }
-
     return (
         <View style={styles.container}>
             <LinearGradient colors={GRADIENTS.screen as any} style={StyleSheet.absoluteFill} />
 
             <ScreenHeader
                 title="Fleet Management"
-                subtitle={`${bots.length} Active HydroBots on Mission`}
+                subtitle={`${formattedBots.length} Active HydroBots on Mission`}
                 style={{ paddingHorizontal: SPACE[6], paddingTop: 20 }}
             />
 
             <FlatList
-                data={bots}
+                data={formattedBots}
                 renderItem={renderBotItem}
                 keyExtractor={item => item.id}
                 contentContainerStyle={styles.listContent}
@@ -127,6 +106,7 @@ export default function FleetManagementScreen({ navigation }: Props) {
         </View>
     );
 }
+
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },

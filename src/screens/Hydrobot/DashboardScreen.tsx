@@ -20,10 +20,17 @@ type Props = BottomTabScreenProps<HydrobotTabParamList, 'Fleet'>;
 
 export function DashboardScreen({ navigation }: Props) {
     const theme = useTheme<Theme>();
-    const { robots, isLoading, connectionStatus } = useRobotStore();
+    const { robots, isLoading, connectionStatus, missionStats } = useRobotStore();
     const alertStore = useAlertStore();
     const { width } = useWindowDimensions();
     const numColumns = width > 600 ? 2 : 1;
+
+    // Helper to format time (seconds to Hh Mm)
+    const formatTime = (seconds: number) => {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        return `${h}h ${m}m`;
+    };
 
     // Calculate composite Water Quality Index from all robots
     const waterQuality = useMemo(() => {
@@ -99,12 +106,13 @@ export function DashboardScreen({ navigation }: Props) {
                     <GlassCard style={styles.missionCard}>
                         <Text variant="caption" style={{ fontWeight: '700', marginBottom: 8 }}>TODAY'S MISSION</Text>
                         <View style={styles.missionStats}>
-                            <MissionStat label="Distance" value="4.2 km" icon="map-marker-distance" />
-                            <MissionStat label="Trash" value="12 kg" icon="trash-can" />
-                            <MissionStat label="Time" value="2h 45m" icon="clock-outline" />
+                            <MissionStat label="Distance" value={`${missionStats.totalDistance.toFixed(1)} km`} icon="map-marker-distance" />
+                            <MissionStat label="Trash" value={`${missionStats.totalTrash} kg`} icon="trash-can" />
+                            <MissionStat label="Time" value={formatTime(missionStats.totalTime)} icon="clock-outline" />
                         </View>
                     </GlassCard>
                 </Animated.View>
+
 
                 {/* Recent Alerts Strip */}
                 {unreadAlerts > 0 && (

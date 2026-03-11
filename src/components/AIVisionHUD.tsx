@@ -1,37 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { MotiView, AnimatePresence } from 'moti';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SPACE } from '../constants/theme';
 import GlassCard from './GlassCard';
-
-interface Detection {
-    object: string;
-    confidence: number;
-    coords: number[];
-    count: number;
-}
+import { useRobotStore } from '../store/useRobotStore';
 
 export default function AIVisionHUD() {
-    const [detection, setDetection] = useState<Detection>({
-        object: 'Plastic Bottle',
-        confidence: 0.98,
-        coords: [120, 45, 200, 300],
-        count: 142
-    });
+    const { detections, missionStats } = useRobotStore();
 
-    useEffect(() => {
-        const id = setInterval(() => {
-            const items = ['Plastic Bottle', 'Aluminum Can', 'Metal Scrap', 'Bio-waste'];
-            setDetection(prev => ({
-                ...prev,
-                object: items[Math.floor(Math.random() * items.length)],
-                confidence: parseFloat((0.9 + Math.random() * 0.09).toFixed(2)),
-                count: prev.count + (Math.random() > 0.8 ? 1 : 0)
-            }));
-        }, 3000);
-        return () => clearInterval(id);
-    }, []);
+    const latestDetection = useMemo(() => {
+        if (detections.length === 0) return null;
+        return detections[0];
+    }, [detections]);
+
+    const displayObject = latestDetection ? latestDetection.type : 'Scanning...';
+    const displayConfidence = latestDetection ? latestDetection.confidence : 0;
+
 
     return (
         <GlassCard style={styles.container} variant="elevated">
@@ -45,26 +30,29 @@ export default function AIVisionHUD() {
                     <Text style={styles.label}>OBJECT</Text>
                     <AnimatePresence exitBeforeEnter>
                         <MotiView
-                            key={detection.object}
+                            key={displayObject}
                             from={{ opacity: 0, translateX: -10 }}
                             animate={{ opacity: 1, translateX: 0 }}
                             exit={{ opacity: 0, translateX: 10 }}
                         >
-                            <Text style={styles.value}>{detection.object}</Text>
+                            <Text style={styles.value}>{displayObject}</Text>
                         </MotiView>
                     </AnimatePresence>
                 </View>
 
                 <View style={styles.item}>
                     <Text style={styles.label}>CONFIDENCE</Text>
-                    <Text style={[styles.value, { color: COLORS.success }]}>{(detection.confidence * 100).toFixed(0)}%</Text>
+                    <Text style={[styles.value, { color: displayConfidence > 0.8 ? COLORS.success : COLORS.warning }]}>
+                        {latestDetection ? (displayConfidence * 100).toFixed(0) + '%' : '--'}
+                    </Text>
                 </View>
 
                 <View style={styles.item}>
                     <Text style={styles.label}>TOTAL TRASH</Text>
-                    <Text style={styles.value}>{detection.count}</Text>
+                    <Text style={styles.value}>{missionStats.totalTrash}</Text>
                 </View>
             </View>
+
 
             <View style={styles.footer}>
                 <View style={styles.scannerLine} />

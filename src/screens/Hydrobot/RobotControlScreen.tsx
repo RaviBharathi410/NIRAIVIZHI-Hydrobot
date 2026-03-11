@@ -32,7 +32,7 @@ export function RobotControlScreen({ route }: Props) {
         if (controlMode !== 'MANUAL' || !robot) return;
 
         const interval = setInterval(() => {
-            socketService.sendCommand(robot.id, {
+            socketService.sendRobotCommand(robot.id, {
                 heading: commandRef.current.heading,
                 speed: commandRef.current.speed,
             });
@@ -57,7 +57,7 @@ export function RobotControlScreen({ route }: Props) {
     };
 
     const handleStop = () => {
-        socketService.sendCommand(robot.id, { emergency_stop: true });
+        socketService.sendRobotCommand(robot.id, { emergency_stop: true });
     };
 
     return (
@@ -114,7 +114,9 @@ export function RobotControlScreen({ route }: Props) {
             {/* Footer Actions */}
             <View style={styles.footer}>
                 <View style={styles.statusFooter}>
-                    <Text variant="mono" style={{ fontSize: 12 }}>GPS: {robot.location.latitude.toFixed(4)}, {robot.location.longitude.toFixed(4)}</Text>
+                    <Text variant="mono" style={{ fontSize: 12 }}>
+                        GPS: {robot.telemetry.location.latitude.toFixed(4)}, {robot.telemetry.location.longitude.toFixed(4)}
+                    </Text>
                     <Text variant="caption" style={{ opacity: 0.6 }}>BATTERY: {robot.battery}%</Text>
                 </View>
                 <EmergencyStopButton onTrigger={handleStop} size={90} />

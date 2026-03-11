@@ -15,6 +15,7 @@ interface AuthContextType {
     isLoading: boolean;
     isAuthenticated: boolean;
     login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+    bypassLogin: (role: string) => Promise<void>;
     logout: () => Promise<void>;
 }
 
@@ -88,8 +89,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const bypassLogin = async (role: string) => {
+        const mockUser: User = {
+            id: 'dev-user',
+            name: 'Developer',
+            email: 'dev@aquaguard.com',
+            role: role,
+        };
+        setUser(mockUser);
+        setIsAuthenticated(true);
+        await storage.set(storage.KEYS.AUTH_TOKEN, 'dev-token');
+        await storage.set(storage.KEYS.USER_DATA, mockUser);
+        await storage.set(storage.KEYS.USER_ROLE, role);
+    };
+
     return (
-        <AuthContext.Provider value={{ user, isLoading, isAuthenticated, login, logout }}>
+        <AuthContext.Provider value={{ user, isLoading, isAuthenticated, login, bypassLogin, logout }}>
             {children}
         </AuthContext.Provider>
     );

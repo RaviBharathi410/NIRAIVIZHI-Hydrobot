@@ -7,7 +7,7 @@ import { COLORS, FONTS, GRADIENTS, SPACE, SHADOWS } from '../../constants/theme'
 import GlassCard from '../../components/GlassCard';
 import SectionHeader from '../../components/SectionHeader';
 import ScreenHeader from '../../components/ScreenHeader';
-import { CartesianChart, Line } from 'victory-native';
+import WebLineChart from '../../components/charts/WebLineChart';
 
 const TREND_DATA = [
     { day: 'Mon', cases: 5 },
@@ -72,27 +72,14 @@ export default function SymptomTrendsScreen() {
                             </View>
                         </View>
 
-                        <View style={styles.victoryWrapper}>
-                            <CartesianChart
-                                data={TREND_DATA}
-                                xKey="day"
-                                yKeys={["cases"]}
-                                axisOptions={{
-                                    font: null as any,
-                                    labelColor: COLORS.textMuted,
-                                    lineColor: 'rgba(255,255,255,0.05)',
-                                }}
-                            >
-                                {({ points }) => (
-                                    <Line
-                                        points={points.cases}
-                                        color={COLORS.danger}
-                                        strokeWidth={4}
-                                        curveType="monotoneX"
-                                    />
-                                )}
-                            </CartesianChart>
-                        </View>
+                        <WebLineChart
+                            data={TREND_DATA}
+                            xKey="day"
+                            lines={[
+                                { key: 'cases', color: COLORS.danger, strokeWidth: 4, filled: true },
+                            ]}
+                            height={180}
+                        />
 
                         <View style={styles.chartFooter}>
                             {TREND_DATA.map((d, i) => (

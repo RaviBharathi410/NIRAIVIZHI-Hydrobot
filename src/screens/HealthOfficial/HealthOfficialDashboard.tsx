@@ -15,8 +15,10 @@ import { COLORS, FONTS, GRADIENTS, SPACE, SHADOWS } from '../../constants/theme'
 import GlassCard from '../../components/GlassCard';
 import SectionHeader from '../../components/SectionHeader';
 import AnimatedButton from '../../components/AnimatedButton';
-import { CartesianChart, Line } from 'victory-native';
+import WebLineChart from '../../components/charts/WebLineChart';
 import ScreenHeader from '../../components/ScreenHeader';
+import { useRobotStore } from '../../store/useRobotStore';
+import { useAlertStore } from '../../store/useAlertStore';
 
 const CHART_DATA = [
     { day: 'Mon', caseload: 40, baseline: 30 },
@@ -52,6 +54,14 @@ const CrisisPulse = () => {
 };
 
 export default function HealthOfficialDashboard({ navigation }: any) {
+    const robots = useRobotStore(state => state.robots);
+    const alerts = useAlertStore(state => state.alerts);
+    const criticalAlerts = alerts.filter(a => a.severity === 'critical');
+    const latestCritical = criticalAlerts[0] || alerts.find(a => a.severity === 'warning');
+
+    const onlineBots = robots.filter(r => r.status === 'ONLINE').length;
+    const avgEfficiency = robots.reduce((acc, r) => acc + (r.battery + (r.telemetry.pollutionIndex || 0)) / 2, 0) / (robots.length || 1);
+
     return (
         <View style={styles.container}>
             <LinearGradient colors={GRADIENTS.screen as any} style={StyleSheet.absoluteFill} />
@@ -65,30 +75,34 @@ export default function HealthOfficialDashboard({ navigation }: any) {
                     />
                 </Animated.View>
 
-                <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.alertBanner}>
-                    <TouchableOpacity
-                        activeOpacity={0.9}
-                        onPress={() => navigation.navigate('RegionalAnalytics')}
-                    >
-                        <GlassCard style={styles.alertCard} variant="heavy">
-                            <LinearGradient
-                                colors={[COLORS.danger, '#B91C1C']}
-                                style={styles.alertIconBox}
-                                start={{ x: 0, y: 0 }}
-                                end={{ x: 1, y: 1 }}
-                            >
-                                <CrisisPulse />
-                            </LinearGradient>
-                            <View style={styles.alertInfo}>
-                                <Text style={styles.alertTitle}>CRITICAL ANOMALY</Text>
-                                <Text style={styles.alertText}>
-                                    Bacterial spike detected in Sector 4. Correlation with TDS spike: High.
-                                </Text>
-                            </View>
-                            <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textMuted} />
-                        </GlassCard>
-                    </TouchableOpacity>
-                </Animated.View>
+                {latestCritical && (
+                    <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.alertBanner}>
+                        <TouchableOpacity
+                            activeOpacity={0.9}
+                            onPress={() => navigation.navigate('RegionalAnalytics')}
+                        >
+                            <GlassCard style={styles.alertCard} variant="heavy">
+                                <LinearGradient
+                                    colors={[latestCritical.severity === 'critical' ? COLORS.danger : COLORS.warning, latestCritical.severity === 'critical' ? '#B91C1C' : '#D97706']}
+                                    style={styles.alertIconBox}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 1 }}
+                                >
+                                    <CrisisPulse />
+                                </LinearGradient>
+                                <View style={styles.alertInfo}>
+                                    <Text style={[styles.alertTitle, latestCritical.severity === 'warning' && { color: COLORS.warning }]}>
+                                        {latestCritical.severity === 'critical' ? 'CRITICAL ANOMALY' : 'REGIONAL WARNING'}
+                                    </Text>
+                                    <Text style={styles.alertText}>
+                                        {latestCritical.title}: {latestCritical.message}
+                                    </Text>
+                                </View>
+                                <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.textMuted} />
+                            </GlassCard>
+                        </TouchableOpacity>
+                    </Animated.View>
+                )}
 
                 <Animated.View entering={FadeInDown.delay(300).springify()}>
                     <TouchableOpacity
@@ -109,35 +123,15 @@ export default function HealthOfficialDashboard({ navigation }: any) {
                             </View>
                         </View>
 
-                        <View style={styles.victoryWrapper}>
-                            <CartesianChart
-                                data={CHART_DATA}
-                                xKey="day"
-                                yKeys={["caseload", "baseline"]}
-                                axisOptions={{
-                                    font: null as any,
-                                    labelColor: COLORS.textMuted,
-                                    lineColor: 'rgba(255,255,255,0.05)',
-                                }}
-                            >
-                                {({ points }) => (
-                                    <>
-                                        <Line
-                                            points={points.baseline}
-                                            color={COLORS.primary + '40'}
-                                            strokeWidth={2}
-                                            curveType="monotoneX"
-                                        />
-                                        <Line
-                                            points={points.caseload}
-                                            color={COLORS.danger}
-                                            strokeWidth={4}
-                                            curveType="monotoneX"
-                                        />
-                                    </>
-                                )}
-                            </CartesianChart>
-                        </View>
+                        <WebLineChart
+                            data={CHART_DATA}
+                            xKey="day"
+                            lines={[
+                                { key: 'baseline', color: COLORS.primary + '80', strokeWidth: 2 },
+                                { key: 'caseload', color: COLORS.danger, strokeWidth: 4, filled: true },
+                            ]}
+                            height={180}
+                        />
                         <View style={styles.chartFooter}>
                             {CHART_DATA.map((d, i) => (
                                 <Text key={i} style={styles.footerLabel}>{d.day}</Text>
@@ -151,13 +145,13 @@ export default function HealthOfficialDashboard({ navigation }: any) {
                     <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.gridItem}>
                         <GlassCard style={styles.gridCard} variant="elevated">
                             <View style={[styles.gridIcon, { backgroundColor: COLORS.accent + '15' }]}>
-                                <MaterialCommunityIcons name="ambulance" size={24} color={COLORS.accent} />
+                                <MaterialCommunityIcons name="robot-industrial" size={24} color={COLORS.accent} />
                             </View>
-                            <Text style={styles.gridVal}>12</Text>
-                            <Text style={styles.gridLabel}>Mobile Units</Text>
+                            <Text style={styles.gridVal}>{onlineBots}</Text>
+                            <Text style={styles.gridLabel}>Active Bots</Text>
                             <View style={styles.statusBox}>
                                 <View style={styles.statusDot} />
-                                <Text style={styles.statusText}>READY</Text>
+                                <Text style={styles.statusText}>SYNCED</Text>
                             </View>
                         </GlassCard>
                     </Animated.View>
@@ -166,11 +160,11 @@ export default function HealthOfficialDashboard({ navigation }: any) {
                             <View style={[styles.gridIcon, { backgroundColor: COLORS.primary + '15' }]}>
                                 <MaterialCommunityIcons name="water-pump" size={24} color={COLORS.primary} />
                             </View>
-                            <Text style={styles.gridVal}>84%</Text>
-                            <Text style={styles.gridLabel}>Plant Efficiency</Text>
-                            <View style={[styles.statusBox, { backgroundColor: COLORS.warning + '10' }]}>
-                                <View style={[styles.statusDot, { backgroundColor: COLORS.warning }]} />
-                                <Text style={[styles.statusText, { color: COLORS.warning }]}>MAINTENANCE</Text>
+                            <Text style={styles.gridVal}>{Math.round(avgEfficiency)}%</Text>
+                            <Text style={styles.gridLabel}>Avg Efficiency</Text>
+                            <View style={[styles.statusBox, { backgroundColor: COLORS.success + '10' }]}>
+                                <View style={[styles.statusDot, { backgroundColor: COLORS.success }]} />
+                                <Text style={[styles.statusText, { color: COLORS.success }]}>OPTIMAL</Text>
                             </View>
                         </GlassCard>
                     </Animated.View>

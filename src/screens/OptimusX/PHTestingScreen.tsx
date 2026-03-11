@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MotiView, AnimatePresence } from 'moti';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, GRADIENTS, SPACE } from '../../constants/theme';
-import useBluetoothMock from '../../hooks/useBluetoothMock';
+import { useRobotStore } from '../../store/useRobotStore';
 import AlertSystem from '../../services/AlertSystem';
 import GlassCard from '../../components/GlassCard';
 import RingGauge from '../../components/RingGauge';
@@ -18,9 +18,14 @@ import { OptimusXStackParamList } from '../../navigation/OptimusXStack';
 type Props = NativeStackScreenProps<OptimusXStackParamList, 'PHTesting'>;
 
 export default function PHTestingScreen({ }: Props) {
-    const { isConnected, isScanning, sensorData, scan, connect, disconnect } = useBluetoothMock();
+    const { robots, selectedRobotId, connectionStatus } = useRobotStore();
+    const robot = robots.find(r => r.id === selectedRobotId) || robots[0];
+    const phValue = robot?.telemetry.ph || 7.0;
+
     const [history, setHistory] = useState<number[]>([]);
     const [initializing, setInitializing] = useState(true);
+
+    const isConnected = connectionStatus === 'CONNECTED' && robot?.status === 'ONLINE';
 
     useEffect(() => {
         const timer = setTimeout(() => setInitializing(false), 800);
@@ -28,14 +33,15 @@ export default function PHTestingScreen({ }: Props) {
     }, []);
 
     useEffect(() => {
-        if (sensorData) {
-            setHistory(prev => [...prev.slice(-11), parseFloat(String(sensorData.ph))]);
+        if (isConnected) {
+            setHistory(prev => [...prev.slice(-11), phValue]);
         }
-    }, [sensorData]);
+    }, [phValue, isConnected]);
 
-    const ph = sensorData ? parseFloat(String(sensorData.ph)) : 7.0;
-    const status = sensorData ? AlertSystem.getWaterStatus('ph', sensorData.ph) : 'neutral';
+    const ph = phValue;
+    const status = isConnected ? AlertSystem.getWaterStatus('ph', ph) : 'neutral';
     const statusColor = status === 'safe' ? COLORS.success : status === 'moderate' ? COLORS.warning : COLORS.danger;
+
 
     // PH scale colors mapping
     const getPHColor = (val: number) => {
@@ -67,14 +73,14 @@ export default function PHTestingScreen({ }: Props) {
 
                 <SensorConnectionButton
                     isConnected={isConnected}
-                    isScanning={isScanning}
-                    onConnect={() => { scan(); setTimeout(() => connect('PH-PROBE-X'), 2000); }}
-                    onDisconnect={disconnect}
+                    isScanning={false}
+                    onConnect={() => { }}
+                    onDisconnect={() => { }}
                 />
 
                 <AnimatePresence>
-                    {sensorData && (
-                        <MotiView from={{ opacity: 0, translateY: 20 }} animate={{ opacity: 1, translateY: 0 }}>
+                    {isConnected ? (
+                        <MotiView key="data-view" from={{ opacity: 0, translateY: 20 }} animate={{ opacity: 1, translateY: 0 }}>
                             <GlassCard style={styles.mainCard} variant="heavy">
                                 <View style={[styles.glowBackground, { backgroundColor: getPHColor(ph) + '15' }]} />
 
@@ -140,8 +146,22 @@ export default function PHTestingScreen({ }: Props) {
                                 </GlassCard>
                             )}
                         </MotiView>
+                    ) : (
+                        <MotiView
+                            key="offline-view"
+                            from={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            style={styles.emptyContainer}
+                        >
+                            <View style={styles.centeredIcon}>
+                                <MaterialCommunityIcons name="robot-off" size={80} color={COLORS.textMuted} />
+                            </View>
+                            <Text style={styles.emptyTitle}>Robot Link Offline</Text>
+                            <Text style={styles.emptySub}>The pH probe data link to {robot?.name || 'the robot'} is currently unavailable.</Text>
+                        </MotiView>
                     )}
                 </AnimatePresence>
+
             </ScrollView>
         </View>
     );
@@ -166,4 +186,8 @@ const styles = StyleSheet.create({
     adviceText: { flex: 1, marginLeft: 16 },
     adviceTitle: { ...FONTS.bold, fontSize: 16 },
     adviceSub: { ...FONTS.medium, fontSize: 13, color: COLORS.textSecondary, marginTop: 4, lineHeight: 20 },
+    emptyContainer: { alignItems: 'center', marginTop: 60, paddingHorizontal: 30 },
+    centeredIcon: { marginBottom: 20 },
+    emptyTitle: { ...FONTS.bold, fontSize: 20, color: COLORS.white, marginTop: 24 },
+    emptySub: { ...FONTS.medium, fontSize: 14, color: COLORS.textSecondary, textAlign: 'center', marginTop: 8, lineHeight: 22 },
 });

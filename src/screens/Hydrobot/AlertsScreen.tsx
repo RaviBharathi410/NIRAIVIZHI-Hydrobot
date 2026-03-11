@@ -5,6 +5,7 @@ import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme/restyleTheme';
 import Text from '../../components/atoms/Text';
 import { useAlertStore, Alert, AlertSeverity } from '../../store/useAlertStore';
+import { AlertItem } from '../../components/notifications/AlertItem';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 type FilterType = 'all' | AlertSeverity;
@@ -117,7 +118,7 @@ export function AlertsScreen() {
                         </View>
                     )}
                     renderItem={({ item }) => (
-                        <AlertRow
+                        <AlertItem
                             alert={item}
                             onPress={() => handlePress(item)}
                             onDismiss={() => handleDismiss(item.id)}
@@ -137,53 +138,6 @@ export function AlertsScreen() {
     );
 }
 
-function AlertRow({ alert, onPress, onDismiss }: { alert: Alert; onPress: () => void; onDismiss: () => void }) {
-    const theme = useTheme<Theme>();
-    const color = SEVERITY_COLORS[alert.severity];
-    const iconName = SEVERITY_ICONS[alert.severity];
-
-    const timeAgo = getTimeAgo(alert.timestamp);
-
-    return (
-        <Animated.View exiting={FadeOutLeft.duration(300)}>
-            <TouchableOpacity
-                style={[styles.alertRow, !alert.read && styles.alertRowUnread]}
-                onPress={onPress}
-                activeOpacity={0.7}
-            >
-                <View style={[styles.iconContainer, { backgroundColor: color + '20' }]}>
-                    <MaterialCommunityIcons name={iconName as any} size={20} color={color} />
-                </View>
-
-                <View style={styles.alertContent}>
-                    <View style={styles.alertTitleRow}>
-                        <Text variant="body" style={[styles.alertTitle, !alert.read && { fontWeight: '700' }]} numberOfLines={1}>
-                            {alert.title}
-                        </Text>
-                        {!alert.read && <View style={styles.unreadDot} />}
-                    </View>
-                    <Text variant="caption" style={{ marginTop: 2 }} numberOfLines={2}>
-                        {alert.message}
-                    </Text>
-                    <View style={styles.alertMeta}>
-                        {alert.robotId && (
-                            <Text variant="caption" style={styles.metaText}>
-                                Robot {alert.robotId}
-                            </Text>
-                        )}
-                        <Text variant="caption" style={styles.metaText}>
-                            {alert.robotId ? ' · ' : ''}{timeAgo}
-                        </Text>
-                    </View>
-                </View>
-
-                <TouchableOpacity onPress={onDismiss} style={styles.dismissBtn} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                    <MaterialCommunityIcons name="close" size={16} color={theme.colors.textMuted as string} />
-                </TouchableOpacity>
-            </TouchableOpacity>
-        </Animated.View>
-    );
-}
 
 function FilterTab({ label, count, active, onPress, color }: {
     label: string; count: number; active: boolean; onPress: () => void; color?: string;

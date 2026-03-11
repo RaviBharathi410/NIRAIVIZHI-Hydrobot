@@ -8,7 +8,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, GRADIENTS, SPACE, SHADOWS } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import apiService from '../../services/api';
+import { useRobotStore } from '../../store/useRobotStore';
+import { useAlertStore } from '../../store/useAlertStore';
 import GlassCard from '../../components/GlassCard';
 import IconBadge from '../../components/IconBadge';
 import HeaderActions from '../../components/HeaderActions';
@@ -19,44 +20,26 @@ import AIVisionHUD from '../../components/AIVisionHUD';
 import Robot3D from '../../components/animations/Robot3D';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { OptimusXStackParamList } from '../../navigation/OptimusXStack';
+import { formatDistanceToNow } from 'date-fns';
 
 type Props = NativeStackScreenProps<OptimusXStackParamList, 'Home'>;
 
 export default function OptimusXHomePage({ navigation }: Props) {
     const { user } = useAuth();
     const { t } = useLanguage();
-    const [loading, setLoading] = useState(true);
-    const [sensorData, setSensorData] = useState<any>(null);
-    const [alerts, setAlerts] = useState<any[]>([]);
-    const [fleet, setFleet] = useState<any[]>([]);
+    const { robots, isLoading } = useRobotStore();
+    const { alerts } = useAlertStore();
     const [refreshing, setRefreshing] = useState(false);
-
-    const loadData = async () => {
-        try {
-            const [sensor, alertList, bots] = await Promise.all([
-                apiService.getWaterQuality(),
-                apiService.getAlerts(),
-                apiService.getBotFleet(),
-            ]);
-            setSensorData(sensor);
-            setAlerts(alertList);
-            setFleet(bots);
-        } catch (error) {
-            console.error('Data load failed', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => { loadData(); }, []);
 
     const onRefresh = async () => {
         setRefreshing(true);
-        await loadData();
+        // Simulate a store refresh
+        await new Promise(resolve => setTimeout(resolve, 1500));
         setRefreshing(false);
     };
 
-    const activeBots = fleet.filter(b => b.status === 'active').length;
+    const activeBots = robots.filter(b => b.status === 'ONLINE').length;
+
 
     const QUICK_ACTIONS = [
         { title: t('tds'), icon: 'water-percent', screen: 'TDSTesting', color: '#0284C7' },
@@ -68,7 +51,10 @@ export default function OptimusXHomePage({ navigation }: Props) {
         { title: t('gasSensing'), icon: 'molecule', screen: 'GasSensing', color: '#EF4444' },
         { title: t('trashAnalytics'), icon: 'recycle', screen: 'LiveTrashAnalytics', color: '#059669' },
         { title: t('floodRisk'), icon: 'weather-pouring', screen: 'FloodRiskAlert', color: '#DC2626' },
+        { title: 'Conveyors', icon: 'tray-full', screen: 'DualConveyorControl', color: '#8B5CF6' },
+        { title: 'Valve Control', icon: 'valve', screen: 'HydrobotValveControls', color: '#EC4899' },
     ] as const;
+
 
     const renderSkeleton = () => (
         <View style={styles.skeletonContainer}>
@@ -117,7 +103,7 @@ export default function OptimusXHomePage({ navigation }: Props) {
                 </View>
 
                 <AnimatePresence exitBeforeEnter>
-                    {loading ? (
+                    {isLoading ? (
                         <MotiView
                             key="skeleton"
                             from={{ opacity: 0 }}
@@ -181,15 +167,15 @@ export default function OptimusXHomePage({ navigation }: Props) {
                                                     variant="elevated"
                                                 >
                                                     <View style={styles.alertRow}>
-                                                        <View style={[styles.alertBar, { backgroundColor: alert.type === 'danger' ? COLORS.danger : COLORS.warning }]} />
+                                                        <View style={[styles.alertBar, { backgroundColor: alert.severity === 'critical' ? COLORS.danger : COLORS.warning }]} />
                                                         <MaterialCommunityIcons
-                                                            name={alert.type === 'danger' ? "alert-octagon" : "alert-circle"}
+                                                            name={alert.severity === 'critical' ? "alert-octagon" : "alert-circle"}
                                                             size={24}
-                                                            color={alert.type === 'danger' ? COLORS.danger : COLORS.warning}
+                                                            color={alert.severity === 'critical' ? COLORS.danger : COLORS.warning}
                                                         />
                                                         <View style={styles.alertTextWrapper}>
                                                             <Text style={styles.alertText} numberOfLines={2}>{alert.message}</Text>
-                                                            <Text style={styles.alertTime}>{alert.time}</Text>
+                                                            <Text style={styles.alertTime}>{formatDistanceToNow(alert.timestamp)} ago</Text>
                                                         </View>
                                                     </View>
                                                 </GlassCard>
@@ -197,6 +183,7 @@ export default function OptimusXHomePage({ navigation }: Props) {
                                         </MotiView>
                                     )}
                                 </AnimatePresence>
+
 
                                 <SectionHeader title="Control Hub" />
                                 <View style={styles.actionGrid}>

@@ -42,7 +42,7 @@ export function FleetManagementScreen() {
 
     const sendBatchCommand = useCallback((command: string) => {
         selected.forEach(id => {
-            socketService.sendCommand(id, { command });
+            socketService.sendRobotCommand(id, { command });
         });
         setMultiSelect(false);
         setSelected(new Set());
@@ -73,7 +73,7 @@ export function FleetManagementScreen() {
                 {/* Fleet Summary Cards */}
                 <View style={styles.fleetSummary}>
                     <HealthCard label="Total Units" value={robots.length.toString()} icon="robot" />
-                    <HealthCard label="Online" value={robots.filter(r => r.isOnline).length.toString()} icon="check-circle" color="#34D399" />
+                    <HealthCard label="Online" value={robots.filter(r => r.status === 'ONLINE').length.toString()} icon="check-circle" color="#34D399" />
                     <HealthCard label="Low Battery" value={robots.filter(r => r.battery < 20).length.toString()} icon="battery-low" color="#FF6B6B" />
                 </View>
 
@@ -187,10 +187,10 @@ function GridRobotCard({ robot, isSelected, multiSelect, onPress, onLongPress }:
                 )}
                 <View style={styles.gridCardHeader}>
                     <Text variant="body" style={{ fontWeight: '600' }} numberOfLines={1}>{robot.name}</Text>
-                    <View style={[styles.statusDot, { backgroundColor: robot.isOnline ? '#34D399' : '#FF6B6B' }]} />
+                    <View style={[styles.statusDot, { backgroundColor: robot.status === 'ONLINE' ? '#34D399' : '#FF6B6B' }]} />
                 </View>
                 <Text variant="caption" numberOfLines={1} style={{ marginTop: 4, opacity: 0.7 }}>
-                    {robot.missionStatus}
+                    {robot.status}
                 </Text>
                 {/* Battery bar */}
                 <View style={styles.batteryContainer}>
@@ -222,10 +222,10 @@ function ListRobotCard({ robot, isSelected, multiSelect, onPress, onLongPress }:
                             {isSelected && <MaterialCommunityIcons name="check" size={14} color="white" />}
                         </View>
                     )}
-                    <View style={[styles.statusDot, { backgroundColor: robot.isOnline ? '#34D399' : '#FF6B6B', marginRight: 12 }]} />
+                    <View style={[styles.statusDot, { backgroundColor: robot.status === 'ONLINE' ? '#34D399' : '#FF6B6B', marginRight: 12 }]} />
                     <View style={{ flex: 1 }}>
                         <Text variant="body" style={{ fontWeight: '600' }}>{robot.name}</Text>
-                        <Text variant="caption" style={{ marginTop: 2 }}>{robot.missionStatus}</Text>
+                        <Text variant="caption" style={{ marginTop: 2 }}>{robot.status}</Text>
                     </View>
                     <View style={styles.listCardRight}>
                         {/* Battery */}
@@ -238,7 +238,7 @@ function ListRobotCard({ robot, isSelected, multiSelect, onPress, onLongPress }:
                         </View>
                         {/* GPS */}
                         <Text variant="caption" style={{ fontSize: 10, opacity: 0.5, marginTop: 4 }}>
-                            {robot.location.latitude.toFixed(3)}, {robot.location.longitude.toFixed(3)}
+                            {robot.telemetry.location.latitude.toFixed(3)}, {robot.telemetry.location.longitude.toFixed(3)}
                         </Text>
                     </View>
                     {!multiSelect && (

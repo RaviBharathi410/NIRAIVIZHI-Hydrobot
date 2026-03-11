@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, ActivityIndicator, ViewStyle, StyleProp } from 'react-native';
+import { Pressable, StyleSheet, ActivityIndicator, ViewStyle, StyleProp, Platform } from 'react-native';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -92,10 +92,15 @@ export function Button({
                         height: 56,
                         borderRadius: 28,
                         elevation: 5,
-                        shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 4 },
-                        shadowOpacity: 0.3,
-                        shadowRadius: 4,
+                        ...Platform.select({
+                            web: { boxShadow: '0px 4px 8px rgba(0,0,0,0.3)' } as any,
+                            ios: {
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 4 },
+                                shadowOpacity: 0.3,
+                                shadowRadius: 4,
+                            },
+                        }),
                         paddingHorizontal: 0
                     },
                     text: theme.colors.white,

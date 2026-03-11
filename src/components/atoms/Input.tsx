@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, StyleSheet, ViewStyle } from 'react-native';
+import { View, TextInput, StyleSheet, ViewStyle, Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@shopify/restyle';
 import { Theme } from '../../theme/restyleTheme';
@@ -121,10 +121,15 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     focusedShadow: {
-        shadowColor: '#6366F1',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
+        ...Platform.select({
+            web: { boxShadow: '0px 0px 8px rgba(99, 102, 241, 0.15)' } as any,
+            ios: {
+                shadowColor: '#6366F1',
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+            },
+        }),
     }
 });
 

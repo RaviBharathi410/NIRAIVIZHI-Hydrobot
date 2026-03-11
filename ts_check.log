@@ -19,7 +19,11 @@ src/navigation/HydrobotNavigator.tsx(30,13): error TS2322: Type '({ route }: { r
             Type '{ fontSize: number; fontWeight: string; color: string; }' is not assignable to type 'WithAnimatedObject<TextStyle>'.
               Types of property 'fontWeight' are incompatible.
                 Type 'string' is not assignable to type '"bold" | "regular" | "400" | "normal" | "100" | "200" | "300" | "500" | "600" | "700" | "800" | "900" | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 | "ultralight" | "thin" | "light" | ... 7 more ... | AnimatedInterpolation<...>'.
-src/screens/Hydrobot/DashboardScreen.tsx(79,37): error TS2322: Type '{ value: number; maxValue: number; size: number; strokeWidth: number; color: string; backgroundColor: string; }' is not assignable to type 'IntrinsicAttributes & RingGaugeProps'.
-  Property 'backgroundColor' does not exist on type 'IntrinsicAttributes & RingGaugeProps'.
-src/screens/Hydrobot/WaterAnalyticsScreen.tsx(86,37): error TS2322: Type '{ value: number; maxValue: number; size: number; strokeWidth: number; color: string; backgroundColor: string; }' is not assignable to type 'IntrinsicAttributes & RingGaugeProps'.
-  Property 'backgroundColor' does not exist on type 'IntrinsicAttributes & RingGaugeProps'.
+src/screens/Hydrobot/FleetManagementScreen.tsx(45,27): error TS2339: Property 'sendCommand' does not exist on type 'SocketService'.
+src/screens/Hydrobot/FleetManagementScreen.tsx(76,76): error TS2339: Property 'isOnline' does not exist on type 'Robot'.
+src/screens/Hydrobot/FleetManagementScreen.tsx(190,78): error TS2339: Property 'isOnline' does not exist on type 'Robot'.
+src/screens/Hydrobot/FleetManagementScreen.tsx(193,28): error TS2339: Property 'missionStatus' does not exist on type 'Robot'.
+src/screens/Hydrobot/FleetManagementScreen.tsx(225,78): error TS2339: Property 'isOnline' does not exist on type 'Robot'.
+src/screens/Hydrobot/FleetManagementScreen.tsx(228,81): error TS2339: Property 'missionStatus' does not exist on type 'Robot'.
+src/screens/Hydrobot/FleetManagementScreen.tsx(241,36): error TS2339: Property 'location' does not exist on type 'Robot'.
+src/screens/Hydrobot/FleetManagementScreen.tsx(241,74): error TS2339: Property 'location' does not exist on type 'Robot'.

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MotiView } from 'moti';
@@ -8,14 +8,18 @@ import GlassCard from '../../components/GlassCard';
 import SectionHeader from '../../components/SectionHeader';
 import RingGauge from '../../components/RingGauge';
 import IconBadge from '../../components/IconBadge';
+import { useRobotStore } from '../../store/useRobotStore';
 
 export default function GasSensingScreen() {
-    const [gasLevels] = useState({
-        methane: 12,
-        co2: 420,
-        ammonia: 5,
-        sulfide: 2,
-    });
+    const { robots, selectedRobotId } = useRobotStore();
+    const robot = robots.find(r => r.id === selectedRobotId) || robots[0];
+    const gasLevels = robot?.telemetry.gasLevels || {
+        methane: 0,
+        co2: 400,
+        ammonia: 0,
+        sulfide: 0,
+    };
+
 
     return (
         <View style={styles.container}>
@@ -30,14 +34,15 @@ export default function GasSensingScreen() {
                 <SectionHeader title="Critical Metrics" />
                 <View style={styles.gaugeGrid}>
                     <GlassCard style={styles.gaugeCard}>
-                        <RingGauge value={gasLevels.methane} maxValue={100} size={130} strokeWidth={10} color={COLORS.danger} unit="%" />
+                        <RingGauge value={gasLevels.methane} maxValue={100} size={130} strokeWidth={10} color={gasLevels.methane > 20 ? COLORS.danger : COLORS.success} unit="%" />
                         <Text style={styles.gasLabel}>Methane (CH₄)</Text>
                     </GlassCard>
                     <GlassCard style={styles.gaugeCard}>
-                        <RingGauge value={65} maxValue={100} size={130} strokeWidth={10} color={COLORS.warning} unit="PPM" />
+                        <RingGauge value={gasLevels.ammonia} maxValue={100} size={130} strokeWidth={10} color={gasLevels.ammonia > 15 ? COLORS.warning : COLORS.success} unit="PPM" />
                         <Text style={styles.gasLabel}>Ammonia (NH₃)</Text>
                     </GlassCard>
                 </View>
+
 
                 <SectionHeader title="General Air Quality" />
                 <GlassCard style={styles.aqiCard} variant="elevated">

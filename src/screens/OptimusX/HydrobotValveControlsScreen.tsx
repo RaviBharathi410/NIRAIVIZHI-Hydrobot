@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Switch } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MotiView } from 'moti';
@@ -7,25 +7,19 @@ import { COLORS, FONTS, GRADIENTS, SPACE } from '../../constants/theme';
 import GlassCard from '../../components/GlassCard';
 import SectionHeader from '../../components/SectionHeader';
 import AnimatedButton from '../../components/AnimatedButton';
-
-interface Valve {
-    id: number;
-    name: string;
-    status: boolean;
-    flow: number;
-}
+import { useRobotStore } from '../../store/useRobotStore';
 
 export default function HydrobotValveControlsScreen() {
-    const [valves, setValves] = useState<Valve[]>([
-        { id: 1, name: 'Main Intake', status: true, flow: 85 },
-        { id: 2, name: 'Filtration Bypass', status: false, flow: 0 },
-        { id: 3, name: 'Chemical Injector', status: false, flow: 0 },
-        { id: 4, name: 'Effluent Release', status: true, flow: 60 },
-    ]);
+    const { robots, selectedRobotId, toggleValve, connectionStatus } = useRobotStore();
+    const robot = robots.find(r => r.id === selectedRobotId) || robots[0];
+    const valves = robot?.telemetry.valves || [];
+    const isConnected = connectionStatus === 'CONNECTED' && robot?.status === 'ONLINE';
 
-    const toggleValve = (id: number) => {
-        setValves(prev => prev.map(v => v.id === id ? { ...v, status: !v.status, flow: !v.status ? 80 : 0 } : v));
+    const handleToggle = (id: number) => {
+        if (!robot) return;
+        toggleValve(robot.id, id);
     };
+
 
     return (
         <View style={styles.container}>
@@ -54,10 +48,12 @@ export default function HydrobotValveControlsScreen() {
                                 </View>
                                 <Switch
                                     value={v.status}
-                                    onValueChange={() => toggleValve(v.id)}
+                                    onValueChange={() => handleToggle(v.id)}
                                     trackColor={{ false: 'rgba(255,255,255,0.1)', true: COLORS.success + '60' }}
                                     thumbColor={v.status ? COLORS.success : COLORS.textMuted}
+                                    disabled={!isConnected}
                                 />
+
                             </View>
                             {v.status && (
                                 <MotiView

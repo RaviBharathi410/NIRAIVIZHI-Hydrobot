@@ -3,12 +3,18 @@ import { createNativeStackNavigator, NativeStackNavigationOptions } from '@react
 import CommunityMemberDashboard from '../screens/CommunityMember/CommunityMemberDashboard';
 import LogoutScreen from '../screens/Shared/LogoutScreen';
 import SettingsScreen from '../screens/Settings/SettingsScreen';
+import ProfileScreen from '../screens/Profile/ProfileScreen';
+import ContactScreen from '../screens/Shared/ContactScreen';
+import JudgesFAQScreen from '../screens/Shared/JudgesFAQScreen';
 import HeaderActions from '../components/HeaderActions';
 import { COLORS, FONTS } from '../constants/theme';
 
 export type CommunityMemberStackParamList = {
     CommunityHome: undefined;
     Settings: undefined;
+    Profile: undefined;
+    Contact: undefined;
+    JudgesFAQ: undefined;
     Logout: undefined;
 };
 
@@ -30,7 +36,10 @@ export default function CommunityMemberStack() {
     return (
         <Stack.Navigator screenOptions={SCREEN_OPTIONS}>
             <Stack.Screen name="CommunityHome" component={CommunityMemberDashboard as any} options={{ title: 'Community Portal' }} />
-            <Stack.Screen name="Settings" component={SettingsScreen as any} options={{ title: 'Settings' }} />
+            <Stack.Screen name="Settings" component={SettingsScreen as any} options={{ title: 'Settings', headerShown: true }} />
+            <Stack.Screen name="Profile" component={ProfileScreen as any} options={{ title: 'Profile', headerShown: true }} />
+            <Stack.Screen name="Contact" component={ContactScreen as any} options={{ title: 'Contact', headerShown: true }} />
+            <Stack.Screen name="JudgesFAQ" component={JudgesFAQScreen as any} options={{ title: "FAQ", headerShown: true }} />
             <Stack.Screen name="Logout" component={LogoutScreen as any} options={{ title: 'Account', animation: 'slide_from_bottom' }} />
         </Stack.Navigator>
     );

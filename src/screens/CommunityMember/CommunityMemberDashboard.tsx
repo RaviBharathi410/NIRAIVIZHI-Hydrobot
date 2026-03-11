@@ -9,8 +9,30 @@ import SectionHeader from '../../components/SectionHeader';
 import IconBadge from '../../components/IconBadge';
 import AnimatedButton from '../../components/AnimatedButton';
 import ScreenHeader from '../../components/ScreenHeader';
+import { useRobotStore } from '../../store/useRobotStore';
+import { useAlertStore } from '../../store/useAlertStore';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function CommunityMemberDashboard({ navigation }: any) {
+    const { t } = useLanguage();
+    const robots = useRobotStore(state => state.robots);
+    const missionStats = useRobotStore(state => state.missionStats);
+    const addAlert = useAlertStore(state => state.addAlert);
+
+    // Simulation: Nearest bot is always robot '1' if online
+    const nearestBot = robots.find(r => r.id === '1') || robots[0];
+    const isWaterSafe = (nearestBot?.telemetry.ph || 7) >= 6.5 && (nearestBot?.telemetry.ph || 7) <= 8.5 && (nearestBot?.telemetry.tds || 0) < 300;
+
+    const handleReportIssue = () => {
+        addAlert({
+            severity: 'critical',
+            title: 'Citizen Report: Water Issue',
+            message: 'A community member has reported unusual odor/color near Sector D. Dispatching nearest unit for verification.',
+            robotId: nearestBot?.id
+        });
+        alert('Thank you! Your report has been sent to the sanitation team.');
+    };
+
     return (
         <View style={styles.container}>
             <LinearGradient colors={GRADIENTS.screen as any} style={StyleSheet.absoluteFill} />
@@ -24,20 +46,31 @@ export default function CommunityMemberDashboard({ navigation }: any) {
 
                 <GlassCard style={styles.heroCard} variant="heavy">
                     <View style={styles.heroRow}>
-                        <IconBadge icon="water-check" size={70} color={COLORS.success} glow />
+                        <IconBadge
+                            icon={isWaterSafe ? "water-check" : "water-alert"}
+                            size={70}
+                            color={isWaterSafe ? COLORS.success : COLORS.danger}
+                            glow
+                        />
                         <View style={styles.heroInfo}>
-                            <Text style={styles.heroStatus}>YOUR WATER IS SAFE</Text>
-                            <Text style={styles.heroSub}>Last tested: 2 hours ago by HydroBot 07</Text>
+                            <Text style={[styles.heroStatus, !isWaterSafe && { color: COLORS.danger }]}>
+                                {isWaterSafe ? 'YOUR WATER IS SAFE' : 'TAP WATER ADVISORY'}
+                            </Text>
+                            <Text style={styles.heroSub}>
+                                {isWaterSafe
+                                    ? `Verified by ${nearestBot?.name || 'HydroBot System'}`
+                                    : 'Anomalies detected. Boiling recommended.'}
+                            </Text>
                         </View>
                     </View>
                     <View style={styles.heroMetrics}>
                         <View style={styles.hMetric}>
-                            <Text style={styles.hVal}>240</Text>
+                            <Text style={styles.hVal}>{nearestBot?.telemetry.tds || '--'}</Text>
                             <Text style={styles.hLabel}>TDS</Text>
                         </View>
                         <View style={styles.hDivider} />
                         <View style={styles.hMetric}>
-                            <Text style={styles.hVal}>7.2</Text>
+                            <Text style={styles.hVal}>{nearestBot?.telemetry.ph || '--'}</Text>
                             <Text style={styles.hLabel}>pH</Text>
                         </View>
                     </View>
@@ -45,25 +78,29 @@ export default function CommunityMemberDashboard({ navigation }: any) {
 
                 <SectionHeader title="Community News" />
                 <GlassCard style={styles.newsCard}>
-                    <Text style={styles.newsTitle}>Volunteer Drive this Sunday</Text>
-                    <Text style={styles.newsDesc}>Join us at Sector 4 for a manual plastic sorting workshop. Refreshments provided.</Text>
-                    <AnimatedButton title="I am interested" variant="outline" style={styles.newsBtn} />
+                    <Text style={styles.newsTitle}>Report Local Issues</Text>
+                    <Text style={styles.newsDesc}>Noticed a leak or unusual water color in your pipe? Report it immediately to the ASHA team.</Text>
+                    <AnimatedButton
+                        title="Report Now"
+                        variant="primary"
+                        style={[styles.newsBtn, { backgroundColor: COLORS.danger }]}
+                        onPress={handleReportIssue}
+                    />
                 </GlassCard>
 
                 <SectionHeader title="My Environment" />
                 <View style={styles.envGrid}>
                     <GlassCard style={styles.envCard}>
-                        <MaterialCommunityIcons name="tree-outline" size={32} color={COLORS.success} />
-                        <Text style={styles.envVal}>14</Text>
-                        <Text style={styles.envLabel}>Trees Saved</Text>
+                        <MaterialCommunityIcons name="trash-can-outline" size={32} color={COLORS.success} />
+                        <Text style={styles.envVal}>{Math.floor(missionStats.totalTrash)}</Text>
+                        <Text style={styles.envLabel}>Kgs Trash Removed</Text>
                     </GlassCard>
                     <GlassCard style={styles.envCard}>
                         <MaterialCommunityIcons name="water-percent" size={32} color={COLORS.primary} />
-                        <Text style={styles.envVal}>98%</Text>
-                        <Text style={styles.envLabel}>Clarity</Text>
+                        <Text style={styles.envVal}>{nearestBot?.status === 'ONLINE' ? '98%' : 'OFFLINE'}</Text>
+                        <Text style={styles.envLabel}>System Online</Text>
                     </GlassCard>
                 </View>
-
 
             </ScrollView>
         </View>
