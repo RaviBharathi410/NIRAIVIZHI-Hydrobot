@@ -83,11 +83,14 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
 
     const getColors = (): readonly string[] => {
         if (disabled) return [COLORS.border, COLORS.border];
-        if (finalVariant === 'primary') return GRADIENTS.primary;
-        if (finalVariant === 'accent') return GRADIENTS.accent;
-        if (finalVariant === 'danger') return (GRADIENTS as any).danger || GRADIENTS.primary;
-        if (finalVariant === 'warning') return (GRADIENTS as any).warning || GRADIENTS.primary;
-        return ['transparent', 'transparent'];
+        
+        switch (finalVariant) {
+            case 'primary': return GRADIENTS.primary;
+            case 'accent': return GRADIENTS.accent;
+            case 'danger': return GRADIENTS.danger;
+            case 'warning': return GRADIENTS.warning;
+            default: return ['transparent', 'transparent'];
+        }
     };
 
     const isOutline = finalVariant === 'outline';

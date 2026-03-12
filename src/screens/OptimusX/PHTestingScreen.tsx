@@ -45,8 +45,9 @@ export default function PHTestingScreen({ }: Props) {
 
     // PH scale colors mapping
     const getPHColor = (val: number) => {
-        const index = Math.min(Math.max(Math.floor(val), 0), COLORS.phScale.length - 1);
-        return COLORS.phScale[index];
+        const phScale = COLORS.phScale;
+        const index = Math.min(Math.max(Math.floor(val), 0), phScale.length - 1);
+        return phScale[index];
     };
 
     if (initializing) {

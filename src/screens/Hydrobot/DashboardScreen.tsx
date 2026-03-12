@@ -14,6 +14,7 @@ import { HydrobotTabParamList } from '../../navigation/HydrobotNavigator';
 import { FABMenu } from '../../components/ui/FABMenu';
 import GlassCard from '../../components/GlassCard';
 import { RingGauge } from '../../components/RingGauge';
+import Robot3D from '../../components/animations/Robot3D';
 import { calcPollutionIndex, getPollutionSeverity } from '../../utils/pollutionIndex';
 
 type Props = BottomTabScreenProps<HydrobotTabParamList, 'Fleet'>;
@@ -69,6 +70,13 @@ export function DashboardScreen({ navigation }: Props) {
                                 </View>
                             )}
                         </TouchableOpacity>
+                    </View>
+                </Animated.View>
+
+                {/* 3D Model Header */}
+                <Animated.View entering={FadeInDown.delay(250).springify()}>
+                    <View style={{ height: 200, width: '100%', marginBottom: 16 }}>
+                        <Robot3D />
                     </View>
                 </Animated.View>
 

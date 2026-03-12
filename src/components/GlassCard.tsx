@@ -29,13 +29,17 @@ export default function GlassCard({
     // Cross-platform container styles
     const glassStyle = Platform.select<any>({
         ios: {
-            // For iOS, we primarily rely on BlurView for the blur effect.
-            // These styles are for the container around BlurView or if BlurView is not used.
             backgroundColor: config.bg || 'rgba(255, 255, 255, 0.7)',
             borderWidth: 1,
             borderColor: config.border || 'rgba(15, 23, 42, 0.08)',
             ...(variant === 'elevated' || variant === 'heavy' ? SHADOWS.medium : SHADOWS.small),
-        },
+        } as ViewStyle,
+        android: {
+            backgroundColor: config.bg || 'rgba(255, 255, 255, 0.7)',
+            borderWidth: 1,
+            borderColor: config.border || 'rgba(15, 23, 42, 0.08)',
+            ...(variant === 'elevated' || variant === 'heavy' ? SHADOWS.medium : SHADOWS.small),
+        } as ViewStyle,
         web: {
             backgroundColor: config.bg || 'rgba(255, 255, 255, 0.7)',
             backdropFilter: `blur(${blurIntensity / 2}px)`,
@@ -45,13 +49,13 @@ export default function GlassCard({
             boxShadow: variant === 'elevated' || variant === 'heavy'
                 ? '0px 10px 40px rgba(15, 23, 42, 0.06)'
                 : '0px 4px 20px rgba(15, 23, 42, 0.04)',
-        },
-        default: {
+        } as any, // Cast to any because backdropFilter is web-only
+        native: {
             backgroundColor: config.bg,
             borderWidth: 1,
             borderColor: config.border,
             ...(variant === 'elevated' || variant === 'heavy' ? SHADOWS.medium : SHADOWS.small),
-        }
+        } as ViewStyle
     });
 
     const content = Platform.OS === 'web' ? (

@@ -9,18 +9,20 @@ import Animated, {
 } from 'react-native-reanimated';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@shopify/restyle';
+import { useNavigation } from '@react-navigation/native';
 import { Theme } from '../../theme/restyleTheme';
 import Button from '../atoms/Button';
 import Text from '../atoms/Text';
 
 const ACTIONS = [
-    { icon: 'play', label: 'Start Mission', color: 'primary' },
-    { icon: 'navigation', label: 'Return Home', color: 'primary' },
-    { icon: 'alert-octagon', label: 'Emergency Stop', color: 'danger' },
+    { icon: 'play', label: 'Start Mission', color: 'primary', route: 'FleetManagement' },
+    { icon: 'alert-octagon', label: 'Emergency Alerts', color: 'danger', route: 'Alerts' },
+    { icon: 'cog-outline', label: 'Settings', color: 'primary', route: 'HydrobotSettings' },
 ];
 
 export function FABMenu() {
     const theme = useTheme<Theme>();
+    const navigation = useNavigation<any>();
     const [open, setOpen] = useState(false);
     const rotation = useSharedValue(0);
 
@@ -48,6 +50,7 @@ export function FABMenu() {
                                 <Text variant="caption" style={styles.label}>{action.label}</Text>
                             </View>
                             <Button
+                                onPress={() => navigation.navigate(action.route)}
                                 variant="fab"
                                 style={{ backgroundColor: action.color === 'danger' ? theme.colors.danger : theme.colors.primary }}
                             >

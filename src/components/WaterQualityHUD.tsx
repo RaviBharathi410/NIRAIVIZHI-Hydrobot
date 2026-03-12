@@ -10,7 +10,7 @@ export default function WaterQualityHUD() {
 
     const isConnected = connectionStatus === 'CONNECTED' && robot?.status === 'ONLINE';
 
-    const getStatus = (type: string, val: any): 'safe' | 'moderate' | 'unsafe' | 'default' => {
+    const getStatus = (type: 'ph' | 'tds' | 'turbid' | string, val: any): 'safe' | 'moderate' | 'unsafe' | 'default' => {
         if (val === undefined || val === null || val === '--') return 'default';
         const num = parseFloat(val);
 
@@ -50,28 +50,28 @@ export default function WaterQualityHUD() {
             >
                 <StatusCard
                     title="pH LEVEL"
-                    value={telemetry.ph.toFixed(1)}
+                    value={Number(telemetry.ph || 0).toFixed(1)}
                     unit="pH"
                     status={getStatus('ph', telemetry.ph)}
                     icon="🧪"
                 />
                 <StatusCard
                     title="TDS SENSOR"
-                    value={telemetry.tds.toString()}
+                    value={Number(telemetry.tds || 0).toString()}
                     unit="ppm"
                     status={getStatus('tds', telemetry.tds)}
                     icon="💧"
                 />
                 <StatusCard
                     title="TURBIDITY"
-                    value={telemetry.turbidity.toString()}
+                    value={Number(telemetry.turbidity || 0).toString()}
                     unit="NTU"
                     status={getStatus('turbid', telemetry.turbidity)}
                     icon="🌊"
                 />
                 <StatusCard
                     title="TEMPERATURE"
-                    value={telemetry.temp.toFixed(1)}
+                    value={Number(telemetry.temp || 0).toFixed(1)}
                     unit="°C"
                     status="info"
                     icon="🌡️"

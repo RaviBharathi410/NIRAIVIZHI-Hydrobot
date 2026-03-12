@@ -15,6 +15,7 @@
     "@gorhom/bottom-sheet": "^5.2.8",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-navigation/bottom-tabs": "^6.5.20",
+    "@react-navigation/drawer": "^6.7.2",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/native-stack": "^6.9.26",
     "@react-three/drei": "^9.77.0",
@@ -56,6 +57,7 @@
     "simplex-noise": "^4.0.3",
     "socket.io-client": "^4.8.3",
     "three": "^0.154.0",
+    "use-sync-external-store": "^1.6.0",
     "victory-native": "^41.20.2",
     "zustand": "^5.0.11"
   },

@@ -1,8 +1,14 @@
 import { Platform, TextStyle, ViewStyle } from 'react-native';
 import { LIGHT_THEME } from './lightTheme';
 
-// Professional Medical Slate/Indigo Palette
-export const COLORS = {
+// Explicit type for COLORS to ensure consistency in screens
+export type ColorTheme = typeof COLORS_BASE & {
+    phScale: string[];
+    surfaceLight: string;
+    backgroundLight: string;
+};
+
+const COLORS_BASE = {
     primary: LIGHT_THEME.primary,      // Indigo-500 (#6366F1)
     primaryDark: LIGHT_THEME.primaryHover,
     primaryLight: LIGHT_THEME.primaryLight,
@@ -54,8 +60,24 @@ export const COLORS = {
     border: LIGHT_THEME.border || 'rgba(15, 23, 42, 0.1)',
 };
 
-// Rich Depth Gradients
-export const GRADIENTS = {
+export const COLORS: ColorTheme = COLORS_BASE;
+
+// Explicit type for GRADIENTS
+export type GradientTheme = {
+    primary: readonly string[];
+    accent: readonly string[];
+    warning: readonly string[];
+    danger: readonly string[];
+    success: readonly string[];
+    info: readonly string[];
+    card: readonly string[];
+    header: readonly string[];
+    screen: readonly string[];
+    glow: readonly string[];
+    ring: readonly string[];
+};
+
+export const GRADIENTS: GradientTheme = {
     primary: [LIGHT_THEME.primary, '#2563EB'],
     accent: ['#1E3A8A', '#1E40AF'],
     warning: ['#F59E0B', '#D97706'],
@@ -67,7 +89,7 @@ export const GRADIENTS = {
     screen: ['#F8FAFC', '#F1F5F9'],
     glow: ['rgba(59, 130, 246, 0.12)', 'rgba(59, 130, 246, 0)'],
     ring: [LIGHT_THEME.primary, '#3b82f6'],
-} as const;
+};
 
 // Platform-Safe Production Fonts
 export const FONTS: Record<string, TextStyle> = {

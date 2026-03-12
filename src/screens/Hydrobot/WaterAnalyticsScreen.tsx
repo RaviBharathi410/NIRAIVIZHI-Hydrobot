@@ -99,10 +99,10 @@ export function WaterAnalyticsScreen() {
 
                                 {/* Live sensor values */}
                                 <View style={styles.liveSensors}>
-                                    <LiveSensorValue label="pH" value={robot ? Number(robot.telemetry.ph).toFixed(1) : '--'} color="#00E5FF" />
-                                    <LiveSensorValue label="TDS" value={robot ? String(Math.round(Number(robot.telemetry.tds))) : '--'} unit="ppm" color="#06B6D4" />
-                                    <LiveSensorValue label="Turb" value={robot ? String(Math.round(Number(robot.telemetry.turbidity))) : '--'} unit="NTU" color="#F59E0B" />
-                                    <LiveSensorValue label="Temp" value={robot ? Number(robot.telemetry.temp).toFixed(1) : '--'} unit="°C" color="#EF4444" />
+                                    <LiveSensorValue label="pH" value={robot ? Number(robot.telemetry.ph || 0).toFixed(1) : '--'} color="#00E5FF" />
+                                    <LiveSensorValue label="TDS" value={robot ? String(Math.round(Number(robot.telemetry.tds || 0))) : '--'} unit="ppm" color="#06B6D4" />
+                                    <LiveSensorValue label="Turb" value={robot ? String(Math.round(Number(robot.telemetry.turbidity || 0))) : '--'} unit="NTU" color="#F59E0B" />
+                                    <LiveSensorValue label="Temp" value={robot ? Number(robot.telemetry.temp || 0).toFixed(1) : '--'} unit="°C" color="#EF4444" />
                                 </View>
                             </View>
                         </View>
@@ -117,7 +117,7 @@ export function WaterAnalyticsScreen() {
                     <Animated.View entering={FadeInDown.delay(300).springify()}>
                         <SensorPanel
                             label="pH Level"
-                            currentValue={robot ? Number(robot.telemetry.ph).toFixed(2) : '--'}
+                            currentValue={robot ? Number(robot.telemetry.ph || 0).toFixed(2) : '--'}
                             unit="pH"
                             status={getSensorStatus(Number(robot?.telemetry.ph) || 7, sensorStore.sensors.ph.thresholds)}
                         >
@@ -134,7 +134,7 @@ export function WaterAnalyticsScreen() {
                     <Animated.View entering={FadeInDown.delay(400).springify()}>
                         <SensorPanel
                             label="TDS"
-                            currentValue={robot?.telemetry.tds?.toString() || '--'}
+                            currentValue={robot ? Number(robot.telemetry.tds || 0).toString() : '--'}
                             unit="ppm"
                             status={getSensorStatus(Number(robot?.telemetry.tds) || 250, sensorStore.sensors.tds.thresholds)}
                         >
@@ -150,7 +150,7 @@ export function WaterAnalyticsScreen() {
                     <Animated.View entering={FadeInDown.delay(500).springify()}>
                         <SensorPanel
                             label="Turbidity"
-                            currentValue={robot?.telemetry.turbidity?.toString() || '--'}
+                            currentValue={robot ? Number(robot.telemetry.turbidity || 0).toString() : '--'}
                             unit="NTU"
                             status={getSensorStatus(Number(robot?.telemetry.turbidity) || 45, sensorStore.sensors.turbidity.thresholds)}
                         >
@@ -165,10 +165,11 @@ export function WaterAnalyticsScreen() {
                     <Animated.View entering={FadeInDown.delay(600).springify()}>
                         <SensorPanel
                             label="Temperature"
-                            currentValue={robot ? Number(robot.telemetry.temp).toFixed(1) : '--'}
+                            currentValue={robot ? Number(robot.telemetry.temp || 0).toFixed(1) : '--'}
                             unit="°C"
                             status={getSensorStatus(Number(robot?.telemetry.temp) || 28, sensorStore.sensors.temperature.thresholds)}
                         >
+
                             <SensorLineChart
                                 label="Temperature (°C)"
                                 data={tempData}
