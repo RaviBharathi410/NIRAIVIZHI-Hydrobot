@@ -38,7 +38,7 @@ export default function CommunityMemberDashboard({ navigation }: any) {
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <Animated.View entering={FadeInDown.delay(100).springify()}>
-                    <ScreenHeader title="Citizen Portal" subtitle="Namaste, Ravi" showBack={false} />
+                    <ScreenHeader title="Citizen Portal" subtitle="Namaste, Ravi" showBack={false} showMenu={true} />
                 </Animated.View>
 
                 {/* SUPER PREMIUM HERO */}
@@ -47,7 +47,7 @@ export default function CommunityMemberDashboard({ navigation }: any) {
                         <LinearGradient colors={isWaterSafe ? [COLORS.success, '#0d2b1a'] : [COLORS.danger, '#2b0d0d']} style={StyleSheet.absoluteFill} start={{x:0, y:0}} end={{x:1, y:1}} />
                         <View style={styles.heroContent}>
                             <Animated.View style={[styles.statusRing, pulseStyle, { borderColor: isWaterSafe ? COLORS.success : COLORS.danger }]}>
-                                <MaterialCommunityIcons name={isWaterSafe ? "water-check" : "water-alert"} size={48} color={'#fff'} />
+                                <MaterialCommunityIcons name={isWaterSafe ? "water-check" : "water-alert"} size={48} color={COLORS.text} />
                             </Animated.View>
                             <View style={styles.heroTextContainer}>
                                 <Text style={styles.heroTitle}>{isWaterSafe ? 'WATER IS SAFE' : 'WATER ADVISORY'}</Text>
@@ -150,14 +150,14 @@ const styles = StyleSheet.create({
     heroContent: { padding: 24, flexDirection: 'row', alignItems: 'center' },
     statusRing: { width: 72, height: 72, borderRadius: 36, borderWidth: 3, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)' },
     heroTextContainer: { flex: 1, marginLeft: 20 },
-    heroTitle: { ...FONTS.extraBold, fontSize: 22, color: '#fff', letterSpacing: 0.5 },
-    heroSub: { ...FONTS.medium, fontSize: 13, color: 'rgba(255,255,255,0.8)', marginTop: 4, lineHeight: 18 },
-    metricsBar: { flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.3)', paddingVertical: 16, paddingHorizontal: 10 },
+    heroTitle: { ...FONTS.extraBold, fontSize: 22, color: COLORS.text, letterSpacing: 0.5 },
+    heroSub: { ...FONTS.medium, fontSize: 13, color: COLORS.textSecondary, marginTop: 4, lineHeight: 18 },
+    metricsBar: { flexDirection: 'row', backgroundColor: 'rgba(0,0,0,0.05)', paddingVertical: 16, paddingHorizontal: 10 },
     metricItem: { flex: 1, alignItems: 'center' },
-    metricVal: { ...FONTS.bold, fontSize: 20, color: '#fff' },
-    metricUnit: { ...FONTS.medium, fontSize: 12, color: 'rgba(255,255,255,0.6)' },
-    metricLabel: { ...FONTS.bold, fontSize: 10, color: 'rgba(255,255,255,0.6)', marginTop: 4, letterSpacing: 1 },
-    metricDiv: { width: 1, height: '80%', backgroundColor: 'rgba(255,255,255,0.1)' },
+    metricVal: { ...FONTS.bold, fontSize: 20, color: COLORS.text },
+    metricUnit: { ...FONTS.medium, fontSize: 12, color: COLORS.textMuted },
+    metricLabel: { ...FONTS.bold, fontSize: 10, color: COLORS.textSecondary, marginTop: 4, letterSpacing: 1 },
+    metricDiv: { width: 1, height: '80%', backgroundColor: 'rgba(0,0,0,0.05)' },
     actionsContainer: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 32 },
     actionBtn: { alignItems: 'center', width: (width - SPACE[6]*2) / 4 - 8 },
     actionIconBg: { width: 56, height: 56, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },

@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     title: {
         ...FONTS.bold,
         fontSize: 16,
-        color: COLORS.white,
+        color: COLORS.text,
     },
     subtitle: {
         ...FONTS.regular,

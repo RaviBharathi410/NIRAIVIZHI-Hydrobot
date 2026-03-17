@@ -72,6 +72,7 @@ export default function HealthOfficialDashboard({ navigation }: any) {
                         title="Regional Hub"
                         subtitle="Health Oversight & Sanitation Intelligence"
                         showBack={false}
+                        showMenu={true}
                     />
                 </Animated.View>
 

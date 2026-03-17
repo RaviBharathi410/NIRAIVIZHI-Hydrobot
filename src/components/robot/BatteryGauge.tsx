@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import Svg, { Path, Text as SvgText } from 'react-native-svg';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 
 function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
     const rad = ((angleDeg - 90) * Math.PI) / 180;

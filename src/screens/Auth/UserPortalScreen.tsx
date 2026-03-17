@@ -47,39 +47,43 @@ export default function UserPortalScreen({ navigation }: UserPortalScreenProps) 
                     <Text style={styles.subtitle}>Select your institutional portal</Text>
                 </MotiView>
 
-                <SectionHeader title="Available Portals" />
+                <View style={styles.contentContainer}>
+                    <SectionHeader title="Available Portals" style={{ width: '100%' }} />
 
-                <View style={styles.grid}>
-                    {Object.values(ROLES).map((role, i) => (
-                        <MotiView
-                            key={role}
-                            from={{ translateY: 50, opacity: 0 }}
-                            animate={{ translateY: 0, opacity: 1 }}
-                            transition={{ delay: 200 + i * 100, type: 'spring', ...SPRING.gentle } as any}
-                        >
-                            <TouchableOpacity
-                                activeOpacity={0.9}
-                                onPress={() => handleRoleSelect(role)}
+                    <View style={styles.grid}>
+                        {Object.values(ROLES).map((role, i) => (
+                            <MotiView
+                                key={role}
+                                from={{ translateY: 50, opacity: 0 }}
+                                animate={{ translateY: 0, opacity: 1 }}
+                                transition={{ delay: 200 + i * 100, type: 'spring', ...SPRING.gentle } as any}
                             >
-                                <GlassCard style={styles.roleCard}>
-                                    <LinearGradient
-                                        colors={[ROLE_COLORS[role] + '20', 'transparent']}
-                                        start={{ x: 0, y: 0 }}
-                                        end={{ x: 1, y: 1 }}
-                                        style={styles.roleGradient}
-                                    />
-                                    <View style={[styles.roleIconContainer, { backgroundColor: ROLE_COLORS[role] + '15' }]}>
-                                        <MaterialCommunityIcons name={ROLE_ICONS[role as Role] || 'account-circle'} size={30} color={ROLE_COLORS[role]} />
-                                    </View>
-                                    <View style={styles.roleInfo}>
-                                        <Text style={[styles.roleName, { color: ROLE_COLORS[role] }]}>{ROLE_LABELS[role]}</Text>
-                                        <Text style={styles.roleDesc}>Access specialized tools & reports</Text>
-                                    </View>
-                                    <MaterialCommunityIcons name="chevron-right" size={24} color={COLORS.textMuted} />
-                                </GlassCard>
-                            </TouchableOpacity>
-                        </MotiView>
-                    ))}
+                                <TouchableOpacity
+                                    activeOpacity={0.9}
+                                    onPress={() => handleRoleSelect(role)}
+                                >
+                                    <GlassCard style={styles.roleCard}>
+                                        <LinearGradient
+                                            colors={[ROLE_COLORS[role] + '15', 'transparent']}
+                                            start={{ x: 0, y: 0 }}
+                                            end={{ x: 1, y: 1 }}
+                                            style={styles.roleGradient}
+                                        />
+                                        <View style={styles.roleCardInner}>
+                                            <View style={[styles.roleIconContainer, { backgroundColor: ROLE_COLORS[role] + '15' }]}>
+                                                <MaterialCommunityIcons name={ROLE_ICONS[role as Role] || 'account-circle'} size={30} color={ROLE_COLORS[role]} />
+                                            </View>
+                                            <View style={styles.roleInfo}>
+                                                <Text style={[styles.roleName, { color: ROLE_COLORS[role] }]}>{ROLE_LABELS[role]}</Text>
+                                                <Text style={styles.roleDesc}>Access specialized tools & reports</Text>
+                                            </View>
+                                            <MaterialCommunityIcons name="chevron-right" size={24} color={COLORS.textMuted} />
+                                        </View>
+                                    </GlassCard>
+                                </TouchableOpacity>
+                            </MotiView>
+                        ))}
+                    </View>
                 </View>
 
                 <View style={styles.footer}>
@@ -99,6 +103,11 @@ const styles = StyleSheet.create({
         padding: SPACE[6],
         paddingTop: 70,
         paddingBottom: 50,
+        alignItems: 'center',
+    },
+    contentContainer: {
+        width: '100%',
+        maxWidth: 750,
     },
     header: {
         alignItems: 'center',
@@ -130,21 +139,27 @@ const styles = StyleSheet.create({
     },
     grid: {
         marginTop: 10,
+        width: '100%',
     },
     roleCard: {
+        marginBottom: 12,
+        marginVertical: 0,
+        width: '100%',
+    },
+    roleCardInner: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 20,
-        marginBottom: 12,
+        width: '100%',
     },
     roleGradient: {
-        ...StyleSheet.absoluteFillObject,
+        position: 'absolute',
+        top: -16, left: -16, right: -16, bottom: -16,
         borderRadius: SIZES.radiusLg,
     },
     roleIconContainer: {
-        width: 56,
-        height: 56,
-        borderRadius: 16,
+        width: 52,
+        height: 52,
+        borderRadius: 14,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,

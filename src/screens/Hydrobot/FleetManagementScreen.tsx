@@ -3,7 +3,7 @@ import { View, StyleSheet, SafeAreaView, TouchableOpacity, Pressable, ScrollView
 import Animated, { FadeInDown, Layout } from 'react-native-reanimated';
 import { useRobotStore, Robot } from '../../store/useRobotStore';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../../components/atoms/Text';
 import { RobotStatusCard } from '../../components/robot/RobotStatusCard';
 import Button from '../../components/atoms/Button';

@@ -5,7 +5,7 @@ import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { useRobotStore } from '../../store/useRobotStore';
 import { useAlertStore } from '../../store/useAlertStore';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../../components/atoms/Text';
 import { RobotStatusCard } from '../../components/robot/RobotStatusCard';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -14,7 +14,7 @@ import { HydrobotTabParamList } from '../../navigation/HydrobotNavigator';
 import { FABMenu } from '../../components/ui/FABMenu';
 import GlassCard from '../../components/GlassCard';
 import { RingGauge } from '../../components/RingGauge';
-import Robot3D from '../../components/animations/Robot3D';
+import Robot3D from '../../components/robot/Robot3D';
 import { calcPollutionIndex, getPollutionSeverity } from '../../utils/pollutionIndex';
 
 type Props = BottomTabScreenProps<HydrobotTabParamList, 'Fleet'>;

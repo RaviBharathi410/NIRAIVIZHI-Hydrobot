@@ -13,11 +13,12 @@ import { useAlertStore } from '../../store/useAlertStore';
 import GlassCard from '../../components/GlassCard';
 import IconBadge from '../../components/IconBadge';
 import HeaderActions from '../../components/HeaderActions';
+import ScreenHeader from '../../components/ScreenHeader';
 import SectionHeader from '../../components/SectionHeader';
 import SkeletonLoader from '../../components/SkeletonLoader';
 import WaterQualityHUD from '../../components/WaterQualityHUD';
 import AIVisionHUD from '../../components/AIVisionHUD';
-import Robot3D from '../../components/animations/Robot3D';
+import Robot3D from '../../components/robot/Robot3D';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { OptimusXStackParamList } from '../../navigation/OptimusXStack';
 import { formatDistanceToNow } from 'date-fns';
@@ -77,6 +78,10 @@ export default function OptimusXHomePage({ navigation }: Props) {
         <SafeAreaView style={styles.container} edges={['left', 'right']}>
             <LinearGradient colors={GRADIENTS.screen as any} style={StyleSheet.absoluteFill} />
 
+            <View style={styles.backgroundAnimationContainer} pointerEvents="none">
+                <Robot3D />
+            </View>
+
             <ScrollView
                 contentContainerStyle={styles.content}
                 showsVerticalScrollIndicator={false}
@@ -92,13 +97,13 @@ export default function OptimusXHomePage({ navigation }: Props) {
             >
                 <View style={styles.header}>
                     <BlurView intensity={30} tint="light" style={styles.headerBlur}>
-                        <View style={styles.headerRow}>
-                            <View>
-                                <Text style={styles.greeting}>Welcome, {user?.name || 'Explorer'}</Text>
-                                <Text style={styles.headerTitle}>Optimus Dashboard</Text>
-                            </View>
-                            <HeaderActions />
-                        </View>
+                        <ScreenHeader 
+                            title="Optimus Dashboard" 
+                            subtitle={`Welcome, ${user?.name || 'Explorer'}`} 
+                            showBack={false} 
+                            showMenu={true}
+                            style={{ marginBottom: 0 }}
+                        />
                     </BlurView>
                 </View>
 
@@ -120,9 +125,7 @@ export default function OptimusXHomePage({ navigation }: Props) {
                             transition={{ type: 'spring', damping: 20 } as any}
                         >
                             <View style={styles.innerContent}>
-                                <View style={styles.animationContainer}>
-                                    <Robot3D />
-                                </View>
+                                
 
                                 <SectionHeader title="AI Navigation & Vision" />
                                 <AIVisionHUD />
@@ -233,7 +236,7 @@ export default function OptimusXHomePage({ navigation }: Props) {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },
     content: { paddingBottom: 100 },
-    animationContainer: { height: 180, width: '100%', borderRadius: 24, overflow: 'hidden', marginBottom: SPACE[6] },
+    backgroundAnimationContainer: { position: 'absolute', top: 100, left: 0, right: 0, height: Dimensions.get('window').height * 0.5, zIndex: 0, opacity: 0.6 },
     skeletonContainer: { padding: SPACE[6] },
     actionGridSkeleton: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
     header: { zIndex: 100 },

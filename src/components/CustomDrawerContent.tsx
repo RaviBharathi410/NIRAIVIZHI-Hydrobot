@@ -32,6 +32,10 @@ export default function CustomDrawerContent(props: any) {
             
             <View style={styles.footer}>
                 <View style={styles.divider} />
+                <TouchableOpacity style={[styles.logoutBtn, styles.switchBtn]} onPress={() => props.navigation.navigate('Auth', { screen: 'UserPortal' })}>
+                    <MaterialCommunityIcons name="swap-horizontal" size={20} color={COLORS.primary} />
+                    <Text style={[styles.logoutText, { color: COLORS.primary }]}>Switch Portal</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
                     <MaterialCommunityIcons name="power" size={20} color={COLORS.danger} />
                     <Text style={styles.logoutText}>End Session</Text>
@@ -121,5 +125,9 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: COLORS.danger,
         marginLeft: 12,
+    },
+    switchBtn: {
+        backgroundColor: COLORS.primary + '10',
+        marginBottom: 8,
     }
 });

@@ -4,10 +4,11 @@ import { Camera, useCameraDevice, useCameraPermission } from 'react-native-visio
 import { Canvas, Rect } from '@shopify/react-native-skia';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../../components/atoms/Text';
 import GlassCard from '../../components/GlassCard';
 import { useRobotStore } from '../../store/useRobotStore';
+import { COLORS } from '../../constants/theme';
 
 
 interface Detection {
@@ -73,7 +74,7 @@ export function CameraScreen() {
                         <GlassCard style={styles.statusCard}>
                             <View style={styles.statusRow}>
                                 <View style={styles.dot} />
-                                <Text variant="caption" style={{ color: 'white' }}>AI VISION ACTIVE</Text>
+                                <Text variant="caption" style={{ color: COLORS.text }}>AI VISION ACTIVE</Text>
                             </View>
                         </GlassCard>
                     </View>
@@ -83,7 +84,7 @@ export function CameraScreen() {
                         {detections.map(det => (
                             <GlassCard key={det.id} style={styles.logItem}>
                                 <MaterialCommunityIcons name="target" size={16} color="#00E5FF" />
-                                <Text variant="caption" style={{ color: 'white', marginLeft: 8 }}>
+                                <Text variant="caption" style={{ color: COLORS.text, marginLeft: 8 }}>
                                     {det.label} ({(det.confidence * 100).toFixed(0)}%)
                                 </Text>
                             </GlassCard>
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
         width: 180,
     },
     logTitle: {
-        color: 'white',
+        color: COLORS.text,
         opacity: 0.6,
         marginBottom: 10,
         fontWeight: '700',
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
         height: 80,
         borderRadius: 40,
         borderWidth: 4,
-        borderColor: 'white',
+        borderColor: COLORS.textSecondary,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        backgroundColor: 'white',
+        backgroundColor: COLORS.text,
     },
 });
 

@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, GRADIENTS, SPACE } from '../../constants/theme';
 import GlassCard from '../../components/GlassCard';
 import SectionHeader from '../../components/SectionHeader';
+import ScreenHeader from '../../components/ScreenHeader';
 import SimpleChart from '../../components/charts/SimpleChart';
 import IconBadge from '../../components/IconBadge';
 
@@ -32,8 +33,7 @@ export default function LiveTrashAnalyticsScreen() {
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
                 <MotiView from={{ opacity: 0, translateY: -20 }} animate={{ opacity: 1, translateY: 0 }}>
-                    <Text style={styles.title}>Waste Intelligence</Text>
-                    <Text style={styles.subtitle}>Composition & Collection Analytics</Text>
+                    <ScreenHeader title="Waste Intelligence" subtitle="Composition & Collection Analytics" showBack={true} />
                 </MotiView>
 
                 <SectionHeader title="Current Composition" />
@@ -104,19 +104,19 @@ export default function LiveTrashAnalyticsScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },
     content: { padding: SPACE[6], paddingTop: 80, paddingBottom: 60 },
-    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.white },
+    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.text, marginBottom: 8 },
     subtitle: { ...FONTS.medium, fontSize: 16, color: COLORS.textSecondary, marginBottom: SPACE[6] },
     compositionGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
     trashCardContainer: { width: '48%', marginBottom: 16 },
     trashCard: { alignItems: 'center', paddingVertical: 20 },
-    trashValue: { ...FONTS.extraBold, fontSize: 22, color: COLORS.white, marginTop: 12 },
+    trashValue: { ...FONTS.extraBold, fontSize: 22, color: COLORS.text, marginTop: 12 },
     trashLabel: { ...FONTS.bold, fontSize: 12, color: COLORS.textMuted, marginBottom: 12 },
     progressTrack: { width: '80%', height: 4, backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 2, overflow: 'hidden' },
     progressFill: { height: '100%', borderRadius: 2 },
     impactCard: { paddingVertical: 20 },
     impactRow: { flexDirection: 'row', justifyContent: 'space-around' },
     impactItem: { alignItems: 'center' },
-    impactVal: { ...FONTS.bold, fontSize: 20, color: COLORS.white },
+    impactVal: { ...FONTS.bold, fontSize: 20, color: COLORS.text },
     impactLabel: { ...FONTS.medium, fontSize: 11, color: COLORS.textMuted, marginTop: 4 },
     impactDivider: { width: 1, height: '100%', backgroundColor: 'rgba(255,255,255,0.08)' },
     suggestionBox: { flexDirection: 'row', alignItems: 'flex-start', padding: 16, marginTop: 10 },

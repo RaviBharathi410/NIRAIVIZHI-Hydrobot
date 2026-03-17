@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, Switch, TouchableOpacity, Platform } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../../components/atoms/Text';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import GlassCard from '../../components/GlassCard';

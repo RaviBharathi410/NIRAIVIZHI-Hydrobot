@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../theme/restyleTheme';
+import { Theme } from '../constants/restyleTheme';
 import HeaderActions from '../components/HeaderActions';
 
 import { DashboardScreen } from '../screens/Hydrobot/DashboardScreen';

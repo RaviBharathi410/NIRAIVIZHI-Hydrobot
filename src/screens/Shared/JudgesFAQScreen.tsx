@@ -5,6 +5,7 @@ import { MotiView } from 'moti';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, GRADIENTS, SPACE } from '../../constants/theme';
 import GlassCard from '../../components/GlassCard';
+import ScreenHeader from '../../components/ScreenHeader';
 
 export default function JudgesFAQScreen() {
     const FAQS = [
@@ -20,8 +21,8 @@ export default function JudgesFAQScreen() {
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
                 <MotiView from={{ opacity: 0, translateX: -20 }} animate={{ opacity: 1, translateX: 0 }}>
-                    <Text style={styles.title}>Technical FAQ</Text>
-                    <Text style={styles.subtitle}>Detailed insights for the Evaluation Committee</Text>
+
+                    <ScreenHeader title="Technical FAQ" subtitle="Detailed insights for the Evaluation Committee" showBack={true} />
                 </MotiView>
 
                 <View style={styles.faqList}>
@@ -61,17 +62,17 @@ export default function JudgesFAQScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },
     content: { padding: SPACE[6], paddingTop: 80, paddingBottom: 60 },
-    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.white },
+    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.text },
     subtitle: { ...FONTS.medium, fontSize: 16, color: COLORS.textSecondary, marginBottom: SPACE[6] },
     faqList: { marginTop: 20 },
     faqCard: { marginBottom: 16, padding: 20 },
     qRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-    question: { ...FONTS.bold, fontSize: 16, color: COLORS.white, marginLeft: 12, flex: 1 },
+    question: { ...FONTS.bold, fontSize: 16, color: COLORS.text, marginLeft: 12, flex: 1 },
     aRow: { flexDirection: 'row' },
     aLine: { width: 2, backgroundColor: COLORS.accent + '40', borderRadius: 1, marginRight: 15 },
     answer: { ...FONTS.medium, fontSize: 14, color: COLORS.textSecondary, flex: 1, lineHeight: 22 },
     badgeCard: { flexDirection: 'row', alignItems: 'center', padding: 20, marginTop: 20 },
     badgeInfo: { marginLeft: 20 },
-    badgeTitle: { ...FONTS.bold, fontSize: 16, color: COLORS.white },
+    badgeTitle: { ...FONTS.bold, fontSize: 16, color: COLORS.text },
     badgeSub: { ...FONTS.medium, fontSize: 12, color: COLORS.textMuted, marginTop: 4 },
 });

@@ -9,7 +9,7 @@ import Animated, {
     interpolate
 } from 'react-native-reanimated';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../atoms/Text';
 
 interface SpeedSliderProps {

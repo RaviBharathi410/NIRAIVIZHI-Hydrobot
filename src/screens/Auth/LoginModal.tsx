@@ -124,7 +124,7 @@ export default function LoginModal({ navigation, route }: LoginModalProps) {
                             onPress={handleLogin}
                             loading={loading}
                             variant="primary"
-                            style={[styles.submitBtn, { backgroundColor: ROLE_COLORS[roleKey] }]}
+                            style={styles.submitBtn}
                             iconRight="login"
                         />
 
@@ -159,9 +159,10 @@ const styles = StyleSheet.create({
     },
     modalWrapper: {
         width: '100%',
-        maxWidth: 400,
+        maxWidth: 750,
     },
     modal: {
+        width: '100%',
         padding: SPACE[6],
         alignItems: 'center',
     },
@@ -177,12 +178,14 @@ const styles = StyleSheet.create({
         ...FONTS.bold,
         fontSize: 28,
         color: COLORS.text,
+        textAlign: 'center',
     },
     subtitle: {
         ...FONTS.medium,
         fontSize: 14,
         color: COLORS.textSecondary,
         marginBottom: SPACE[6],
+        textAlign: 'center',
     },
     form: {
         width: '100%',

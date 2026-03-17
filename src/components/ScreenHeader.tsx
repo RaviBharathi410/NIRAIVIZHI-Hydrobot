@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, DrawerActions } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SPACE } from '../constants/theme';
 import HeaderActions from './HeaderActions';
@@ -10,6 +10,7 @@ interface ScreenHeaderProps {
     title: string;
     subtitle?: string;
     showBack?: boolean;
+    showMenu?: boolean;
     showActions?: boolean;
     style?: ViewStyle;
 }
@@ -18,6 +19,7 @@ export const ScreenHeader = ({
     title,
     subtitle,
     showBack = true,
+    showMenu = false,
     showActions = true,
     style
 }: ScreenHeaderProps) => {
@@ -38,6 +40,15 @@ export const ScreenHeader = ({
                             activeOpacity={0.7}
                         >
                             <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
+                        </TouchableOpacity>
+                    )}
+                    {showMenu && !showBack && (
+                        <TouchableOpacity
+                            onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}
+                            style={styles.backBtn}
+                            activeOpacity={0.7}
+                        >
+                            <MaterialCommunityIcons name="menu" size={26} color={COLORS.text} />
                         </TouchableOpacity>
                     )}
                     <View>

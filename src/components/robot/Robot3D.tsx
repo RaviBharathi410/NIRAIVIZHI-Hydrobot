@@ -20,28 +20,16 @@ function AnimatedBlob() {
 
     return (
         <Float speed={2} rotationIntensity={1} floatIntensity={2}>
-            {/* Inner Core */}
-            <Sphere ref={meshRef} args={[1, 64, 64]}>
-                <MeshDistortMaterial
-                    color="#00B4D8"
-                    envMapIntensity={2}
-                    clearcoat={1}
-                    clearcoatRoughness={0}
-                    metalness={0.9}
-                    roughness={0.1}
-                    distort={0.5}
-                    speed={3}
-                />
-            </Sphere>
+
 
             {/* Tech Wireframe Layer */}
             <Sphere ref={wireRef} args={[1.15, 32, 32]}>
                 <meshPhongMaterial
-                    color="#4DFF9E"
+                    color="#00B4D8"
                     wireframe
                     transparent
                     opacity={0.3}
-                    emissive="#4DFF9E"
+                    emissive="#00B4D8"
                     emissiveIntensity={0.5}
                 />
             </Sphere>

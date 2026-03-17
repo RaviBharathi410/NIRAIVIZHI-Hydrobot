@@ -3,10 +3,11 @@ import { View, StyleSheet, SafeAreaView, Dimensions, Platform } from 'react-nati
 import MapView, { Marker, PROVIDER_GOOGLE, Polygon, Polyline } from 'react-native-maps';
 import { useRobotStore, Robot } from '../../store/useRobotStore';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../../components/atoms/Text';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import HeaderActions from '../../components/HeaderActions';
+import { COLORS } from '../../constants/theme';
 
 import { useSharedValue, useAnimatedStyle, withRepeat, withTiming, interpolate } from 'react-native-reanimated';
 import Animated from 'react-native-reanimated';
@@ -67,7 +68,7 @@ export function LiveMapScreen() {
                             coordinate={det.location}
                         >
                             <View style={[styles.detectionMarker, { backgroundColor: theme.colors.danger as string }]}>
-                                <MaterialCommunityIcons name="trash-can" size={12} color="white" />
+                                <MaterialCommunityIcons name="trash-can" size={12} color={theme.colors.background as string} />
                             </View>
                         </Marker>
                     ))}
@@ -80,8 +81,8 @@ export function LiveMapScreen() {
                         <View style={styles.row}>
                             <MaterialCommunityIcons name="satellite-variant" size={24} color="#00E5FF" />
                             <View style={{ marginLeft: 12 }}>
-                                <Text variant="body" style={{ fontWeight: '700', color: 'white' }}>FLEET TRACKING</Text>
-                                <Text variant="caption" style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                                <Text variant="body" style={{ fontWeight: '700', color: COLORS.text }}>FLEET TRACKING</Text>
+                                <Text variant="caption" style={{ color: COLORS.textSecondary }}>
                                     {robots.filter(r => r.status === 'ONLINE').length} Active Units
                                 </Text>
                             </View>
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
         height: 12,
         borderRadius: 6,
         borderWidth: 2,
-        borderColor: 'white',
+        borderColor: COLORS.text,
     },
     detectionMarker: {
         width: 20,
@@ -226,7 +227,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1.5,
-        borderColor: 'white',
+        borderColor: COLORS.text,
     },
 });
 

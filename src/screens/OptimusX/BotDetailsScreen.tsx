@@ -9,7 +9,7 @@ import RingGauge from '../../components/RingGauge';
 import SectionHeader from '../../components/SectionHeader';
 import AnimatedButton from '../../components/AnimatedButton';
 import SimpleChart from '../../components/charts/SimpleChart';
-import Robot3D from '../../components/animations/Robot3D';
+import Robot3D from '../../components/robot/Robot3D';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { OptimusXStackParamList } from '../../navigation/OptimusXStack';
 import { Bot } from './FleetManagementScreen';
@@ -30,7 +30,7 @@ export default function BotDetailsScreen({ route, navigation }: Props) {
                     style={styles.header}
                 >
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-                        <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.white} />
+                        <MaterialCommunityIcons name="arrow-left" size={24} color={COLORS.text} />
                     </TouchableOpacity>
                     <View style={styles.botIconWrapper}>
                         <LinearGradient colors={GRADIENTS.primary as any} style={styles.botIconGlow}>
@@ -135,10 +135,10 @@ const styles = StyleSheet.create({
     backBtn: { position: 'absolute', left: 0, top: 0, width: 40, height: 40, justifyContent: 'center' },
     botIconWrapper: { width: 120, height: 120, borderRadius: 60, marginBottom: 20, ...(SHADOWS.glow(COLORS.primary, 20, 0.4) as any) },
     botIconGlow: { flex: 1, borderRadius: 60, justifyContent: 'center', alignItems: 'center' },
-    botName: { ...FONTS.extraBold, fontSize: 28, color: COLORS.white },
-    statusBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20, marginTop: 10 },
+    botName: { ...FONTS.extraBold, fontSize: 28, color: COLORS.text },
+    statusBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(15, 23, 42, 0.1)', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20, marginTop: 10 },
     dot: { width: 8, height: 8, borderRadius: 4, marginRight: 8 },
-    statusText: { ...FONTS.bold, fontSize: 10, color: COLORS.white, letterSpacing: 1 },
+    statusText: { ...FONTS.bold, fontSize: 10, color: COLORS.text, letterSpacing: 1 },
     statsGrid: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 24 },
     statCard: { width: '48%', alignItems: 'center', paddingVertical: 20 },
     statLabel: { ...FONTS.bold, fontSize: 12, color: COLORS.textSecondary, marginTop: 12, textTransform: 'uppercase' },
@@ -146,13 +146,13 @@ const styles = StyleSheet.create({
     diagRow: { flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10, marginTop: 15, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)' },
     diagItem: { alignItems: 'center' },
     diagLabel: { ...FONTS.semiBold, fontSize: 11, color: COLORS.textMuted, marginBottom: 4 },
-    diagValue: { ...FONTS.bold, fontSize: 15, color: COLORS.white },
-    diagDivider: { width: 1, height: '100%', backgroundColor: 'rgba(255,255,255,0.08)' },
+    diagValue: { ...FONTS.bold, fontSize: 15, color: COLORS.text },
+    diagDivider: { width: 1, height: '100%', backgroundColor: COLORS.border },
     controls: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 30 },
     controlBtn: { width: '48%' },
     locationCard: { padding: 0, overflow: 'hidden' },
     locationHeader: { flexDirection: 'row', alignItems: 'center', padding: 16 },
-    locationTitle: { ...FONTS.bold, fontSize: 16, color: COLORS.white, marginLeft: 12 },
+    locationTitle: { ...FONTS.bold, fontSize: 16, color: COLORS.text, marginLeft: 12 },
     mapPlaceholder: { height: 160, justifyContent: 'center', alignItems: 'center' },
     mapOverlay: { justifyContent: 'center', alignItems: 'center' },
     mapPulse: { position: 'absolute', width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.primary },

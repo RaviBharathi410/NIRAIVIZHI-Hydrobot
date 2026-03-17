@@ -31,6 +31,7 @@ export default function ProfileScreen({ navigation }) {
                     title="Profile"
                     subtitle="Medical Core Identity"
                     showActions={false}
+                    showBack={true}
                 />
 
                 <MotiView
@@ -96,7 +97,7 @@ export default function ProfileScreen({ navigation }) {
                     onPress={logout}
                     activeOpacity={0.8}
                 >
-                    <MaterialCommunityIcons name="logout-variant" size={20} color="white" style={{ marginRight: 8 }} />
+                    <MaterialCommunityIcons name="logout-variant" size={20} color={COLORS.text} style={{ marginRight: 8 }} />
                     <Text style={styles.logoutText}>Security Logout</Text>
                 </TouchableOpacity>
 
@@ -182,7 +183,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         ...SHADOWS.medium
     },
-    logoutText: { color: 'white', fontSize: 16, fontWeight: '700' },
+    logoutText: { color: COLORS.text, fontSize: 16, fontWeight: '700' },
     footer: { marginTop: 40, alignItems: 'center', opacity: 0.5 },
     version: { fontSize: 11, fontWeight: '700', color: "#64748B" },
     copy: { fontSize: 9, fontWeight: '600', color: "#64748B", marginTop: 4, letterSpacing: 2 },

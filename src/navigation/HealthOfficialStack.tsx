@@ -40,12 +40,12 @@ export default function HealthOfficialStack() {
     return (
         <Stack.Navigator screenOptions={SCREEN_OPTIONS}>
             <Stack.Screen name="HealthHome" component={HealthOfficialDashboard as any} options={{ title: 'Regional Hub' }} />
-            <Stack.Screen name="RegionalAnalytics" component={RegionalAnalyticsScreen as any} options={{ title: 'Health Intelligence', headerShown: true }} />
-            <Stack.Screen name="DirectiveControl" component={DirectiveControlScreen as any} options={{ title: 'Operational Control', headerShown: true }} />
-            <Stack.Screen name="Settings" component={SettingsScreen as any} options={{ title: 'Settings', headerShown: true }} />
-            <Stack.Screen name="Profile" component={ProfileScreen as any} options={{ title: 'Profile', headerShown: true }} />
-            <Stack.Screen name="Contact" component={ContactScreen as any} options={{ title: 'Contact', headerShown: true }} />
-            <Stack.Screen name="JudgesFAQ" component={JudgesFAQScreen as any} options={{ title: "FAQ", headerShown: true }} />
+            <Stack.Screen name="RegionalAnalytics" component={RegionalAnalyticsScreen as any} options={{ title: 'Health Intelligence' }} />
+            <Stack.Screen name="DirectiveControl" component={DirectiveControlScreen as any} options={{ title: 'Operational Control' }} />
+            <Stack.Screen name="Settings" component={SettingsScreen as any} options={{ title: 'Settings' }} />
+            <Stack.Screen name="Profile" component={ProfileScreen as any} options={{ title: 'Profile' }} />
+            <Stack.Screen name="Contact" component={ContactScreen as any} options={{ title: 'Contact' }} />
+            <Stack.Screen name="JudgesFAQ" component={JudgesFAQScreen as any} options={{ title: "FAQ" }} />
             <Stack.Screen name="Logout" component={LogoutScreen as any} options={{ title: 'Account', animation: 'slide_from_bottom' }} />
         </Stack.Navigator>
     );

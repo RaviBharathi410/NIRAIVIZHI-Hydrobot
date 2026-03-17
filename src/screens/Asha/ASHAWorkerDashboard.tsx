@@ -73,6 +73,7 @@ export default function ASHAWorkerDashboard({ navigation }: any) {
                         title={t('ashaWorkers') || 'ASHA Portal'}
                         subtitle={t('goodDay') || 'Community Health Dashboard'}
                         showBack={false}
+                        showMenu={true}
                     />
                 </Animated.View>
 
@@ -154,7 +155,7 @@ export default function ASHAWorkerDashboard({ navigation }: any) {
                                 style={[styles.intelActionBtn, styles.intelActionBtnPrimary]}
                                 onPress={() => navigation.navigate('SymptomTrends')}
                             >
-                                <Text style={[styles.intelActionText, { color: 'white' }]}>Run Deep Analysis</Text>
+                                <Text style={[styles.intelActionText, { color: COLORS.background }]}>Run Deep Analysis</Text>
                             </TouchableOpacity>
                         </View>
                     </GlassCard>
@@ -181,9 +182,9 @@ const styles = StyleSheet.create({
     statDivider: { width: 1, height: 30, backgroundColor: COLORS.border },
     actionGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
     actionItem: { width: '48%', marginBottom: 16 },
-    actionCard: { padding: 18, alignItems: 'center', height: 130, justifyContent: 'center', borderRadius: 22 },
-    iconContainer: { width: 50, height: 50, borderRadius: 15, justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
-    actionTitle: { ...FONTS.bold, fontSize: 14, color: COLORS.text, marginTop: 2, textAlign: 'center' },
+    actionCard: { padding: 18, alignItems: 'center', height: 130, justifyContent: 'center', borderRadius: 22, marginVertical: 0 },
+    iconContainer: { width: 56, height: 56, borderRadius: 16, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
+    actionTitle: { ...FONTS.bold, fontSize: 13, color: COLORS.text, marginTop: 2, textAlign: 'center', lineHeight: 18 },
     intelligenceCard: { padding: 20, marginTop: 4, borderRadius: 24 },
     intelHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
     intelIcon: { width: 44, height: 44, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },

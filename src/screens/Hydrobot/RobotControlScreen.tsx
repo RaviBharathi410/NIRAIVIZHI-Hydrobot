@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, StyleSheet, SafeAreaView, Pressable, Platform } from 'react-native';
 import { useRobotStore } from '../../store/useRobotStore';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../../components/atoms/Text';
 import { Joystick } from '../../components/controls/Joystick';
 import { SpeedSlider } from '../../components/controls/SpeedSlider';

@@ -26,6 +26,7 @@ export default function SettingsScreen({ navigation }) {
                     title="Settings"
                     subtitle="System Preferences & Profile"
                     showActions={false}
+                    showBack={true}
                 />
 
                 <Text style={styles.sectionLabel}>Account & Profile</Text>

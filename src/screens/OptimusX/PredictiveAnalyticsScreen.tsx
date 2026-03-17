@@ -81,7 +81,7 @@ export default function PredictiveAnalyticsScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },
     content: { padding: SPACE[6], paddingTop: 80, paddingBottom: 60 },
-    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.white },
+    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.text, marginBottom: 8 },
     subtitle: { ...FONTS.medium, fontSize: 16, color: COLORS.textSecondary, marginBottom: SPACE[6] },
     chartCard: { padding: 16, marginBottom: 24 },
     chartLegend: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, paddingHorizontal: 10 },
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     eventCard: { padding: 16, marginBottom: 24 },
     eventRow: { flexDirection: 'row', alignItems: 'center' },
     eventInfo: { flex: 1, marginLeft: 16 },
-    eventTitle: { ...FONTS.bold, fontSize: 16, color: COLORS.white },
+    eventTitle: { ...FONTS.bold, fontSize: 16, color: COLORS.text },
     eventSub: { ...FONTS.medium, fontSize: 12, color: COLORS.textMuted, marginTop: 4 },
     eventProgress: { marginTop: 20 },
     progLabel: { ...FONTS.bold, fontSize: 10, color: COLORS.textMuted, marginBottom: 8, textTransform: 'uppercase' },

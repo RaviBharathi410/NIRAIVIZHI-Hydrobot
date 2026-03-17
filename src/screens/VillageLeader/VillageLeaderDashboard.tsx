@@ -40,7 +40,7 @@ export default function VillageLeaderDashboard({ navigation }: any) {
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <Animated.View entering={FadeInDown.delay(100).springify()}>
-                    <ScreenHeader title="Global Overview" subtitle="Village Leader Command" showBack={false} />
+                    <ScreenHeader title="Global Overview" subtitle="Village Leader Command" showBack={false} showMenu={true} />
                 </Animated.View>
 
                 {/* POSTURE WIDGET */}
@@ -148,8 +148,8 @@ const styles = StyleSheet.create({
     sectionTitleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 16, marginTop: 10 },
     sectionTitle: { ...FONTS.bold, fontSize: 18, color: COLORS.text, letterSpacing: 0.5, marginBottom: 16 },
     seeAll: { ...FONTS.bold, fontSize: 13, color: COLORS.primary, marginBottom: 16 },
-    analyticsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 24 },
-    statCard: { width: '48%', padding: 16, borderRadius: 24, marginBottom: 16 },
+    analyticsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginBottom: 24 },
+    statCard: { flex: 1, minWidth: 140, maxWidth: 280, borderRadius: 24 },
     statLabel: { ...FONTS.medium, fontSize: 12, color: COLORS.textSecondary, marginBottom: 8 },
     statValue: { ...FONTS.extraBold, fontSize: 20, color: COLORS.text, marginBottom: 8 },
     trendRow: { flexDirection: 'row', alignItems: 'center' },

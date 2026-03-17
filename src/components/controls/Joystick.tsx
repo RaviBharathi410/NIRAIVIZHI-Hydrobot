@@ -9,7 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 
 interface JoystickProps {
     onCommand: (command: { x: number; y: number }) => void;
@@ -107,13 +107,10 @@ const styles = StyleSheet.create({
         borderRadius: THUMB_SIZE / 2,
         backgroundColor: '#00E5FF', // Cyan brand color
         elevation: 10,
-        shadowColor: "#00E5FF",
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.5,
-        shadowRadius: 15,
+        boxShadow: '0 0 15px rgba(0, 229, 255, 0.5)',
         borderWidth: 2,
         borderColor: 'white',
-    },
+    } as any,
     guideV: {
         position: 'absolute',
         width: 1,

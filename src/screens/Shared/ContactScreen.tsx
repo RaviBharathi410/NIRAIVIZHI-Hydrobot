@@ -6,6 +6,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, GRADIENTS, SPACE } from '../../constants/theme';
 import GlassCard from '../../components/GlassCard';
 import AnimatedButton from '../../components/AnimatedButton';
+import ScreenHeader from '../../components/ScreenHeader';
 
 export default function ContactScreen() {
     return (
@@ -14,8 +15,7 @@ export default function ContactScreen() {
 
             <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
                 <MotiView from={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-                    <Text style={styles.title}>Support Core</Text>
-                    <Text style={styles.subtitle}>Direct Communication Line to AG-Engineering</Text>
+                    <ScreenHeader title="Support Core" subtitle="Direct Communication Line to AG-Engineering" showBack={true} />
                 </MotiView>
 
                 <GlassCard style={styles.formCard} variant="heavy">
@@ -63,20 +63,20 @@ export default function ContactScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },
     content: { padding: SPACE[6], paddingTop: 80, paddingBottom: 60 },
-    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.white },
+    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.text },
     subtitle: { ...FONTS.medium, fontSize: 16, color: COLORS.textSecondary, marginBottom: SPACE[6] },
     formCard: { padding: 20, marginBottom: 30 },
-    formTitle: { ...FONTS.bold, fontSize: 18, color: COLORS.white, marginBottom: 20, textAlign: 'center' },
+    formTitle: { ...FONTS.bold, fontSize: 18, color: COLORS.text, marginBottom: 20, textAlign: 'center' },
     inputGroup: { marginBottom: 20 },
     label: { ...FONTS.bold, fontSize: 12, color: COLORS.textMuted, marginBottom: 8, textTransform: 'uppercase' },
     inputWrapper: { height: 50, backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)', paddingHorizontal: 16, justifyContent: 'center' },
-    input: { flex: 1, color: COLORS.white, ...FONTS.medium, fontSize: 14 },
+    input: { flex: 1, color: COLORS.text, ...FONTS.medium, fontSize: 14 },
     submitBtn: { marginTop: 10 },
-    contactMethods: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 24 },
-    methodCard: { width: '48%', alignItems: 'center', paddingVertical: 20 },
-    methodVal: { ...FONTS.bold, fontSize: 13, color: COLORS.white, marginTop: 12 },
+    contactMethods: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, justifyContent: 'center', marginBottom: 24 },
+    methodCard: { flex: 1, minWidth: 200, maxWidth: 350, alignItems: 'center' },
+    methodVal: { ...FONTS.bold, fontSize: 13, color: COLORS.text, marginTop: 12 },
     methodLabel: { ...FONTS.medium, fontSize: 10, color: COLORS.textMuted, marginTop: 4, textTransform: 'uppercase' },
     officeCard: { alignItems: 'center', opacity: 0.5, marginTop: 20 },
-    officeTitle: { ...FONTS.bold, fontSize: 14, color: COLORS.white },
+    officeTitle: { ...FONTS.bold, fontSize: 14, color: COLORS.text },
     officeDesc: { ...FONTS.medium, fontSize: 12, color: COLORS.textMuted, marginTop: 4, textAlign: 'center' },
 });

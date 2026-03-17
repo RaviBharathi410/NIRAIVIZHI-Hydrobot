@@ -9,7 +9,7 @@ export const LIGHT_THEME = {
     textPrimary: "#0F172A",         // Slate-900
     textSecondary: "#475569",       // Slate-600
     textMuted: "#94A3B8",          // Slate-400
-    textWhite: "#FFFFFF",
+    textWhite: "#0F172A",
 
     // Borders and structure
     border: "#E2E8F0",             // Slate-200
@@ -61,7 +61,7 @@ export const LIGHT_THEME = {
     buttonDanger: "#EF4444",
     buttonDangerHover: "#DC2626",
 
-    buttonText: "#FFFFFF",
+    buttonText: "#0F172A",
 
     // Status indicators
     online: "#10B981",

@@ -4,7 +4,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useRobotStore } from '../../store/useRobotStore';
 import { useSensorStore } from '../../store/useSensorStore';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../../components/atoms/Text';
 import { SensorLineChart } from '../../components/charts/SensorLineChart.native';
 import { TimeRangeSelector, TimeRange } from '../../components/charts/TimeRangeSelector';

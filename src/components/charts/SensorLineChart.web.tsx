@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Svg, { Path, Polyline, Text as SvgText } from 'react-native-svg';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../atoms/Text';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 

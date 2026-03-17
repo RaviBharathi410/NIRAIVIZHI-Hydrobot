@@ -1,6 +1,6 @@
 import { createTheme } from '@shopify/restyle';
 import { Platform } from 'react-native';
-import { COLORS, SPACE, SIZES } from '../constants/theme';
+import { COLORS, SPACE, SIZES } from './theme';
 
 const theme = createTheme({
     colors: {

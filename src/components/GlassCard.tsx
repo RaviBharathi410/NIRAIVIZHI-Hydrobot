@@ -59,25 +59,31 @@ export default function GlassCard({
     });
 
     const content = Platform.OS === 'web' ? (
-        <View style={[styles.inner, style, glassStyle as ViewStyle]}>
+        <View style={[styles.inner, glassStyle as ViewStyle]}>
             {children}
         </View>
     ) : (
-        <BlurView intensity={blurIntensity} tint="light" style={[styles.blur, style, { borderColor: config.border || COLORS.textMuted }]}>
-            <View style={[styles.inner, { borderBottomWidth: 0, borderTopWidth: 0, borderLeftWidth: 0, borderRightWidth: 0 }]}>
+        <BlurView
+            intensity={blurIntensity}
+            tint="light"
+            style={[styles.blur, glassStyle as ViewStyle]}
+        >
+            <View style={styles.inner}>
                 {children}
             </View>
         </BlurView>
     );
 
-    if (!animate) return <View style={[styles.card, Platform.OS !== 'web' && glassStyle as ViewStyle]}>{content}</View>;
+    const containerStyle = [styles.card, style];
+
+    if (!animate) return <View style={containerStyle}>{content}</View>;
 
     return (
         <MotiView
             from={{ opacity: 0, translateY: 10 }}
             animate={{ opacity: 1, translateY: 0 }}
             transition={{ type: 'spring', damping: 20, stiffness: 150 }}
-            style={[styles.card, Platform.OS !== 'web' && glassStyle as ViewStyle]}
+            style={containerStyle}
         >
             {content}
         </MotiView>
@@ -93,9 +99,11 @@ const styles = StyleSheet.create({
     blur: {
         borderRadius: SIZES.radiusLg,
         borderWidth: 1,
+        width: '100%',
     },
     inner: {
         padding: 16,
         borderRadius: SIZES.radiusLg,
+        width: '100%',
     },
 });

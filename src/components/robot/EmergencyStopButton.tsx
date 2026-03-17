@@ -9,7 +9,7 @@ import Animated, {
 import { Canvas, Path, Skia } from '@shopify/react-native-skia';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../atoms/Text';
 
 interface EmergencyStopButtonProps {

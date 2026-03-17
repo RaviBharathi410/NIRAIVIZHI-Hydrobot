@@ -10,11 +10,10 @@ import { useFontsLoaded } from './src/constants/fonts';
 import { COLORS } from './src/constants/theme';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { initNetworkBypass } from './src/services/networkBypass';
-import { AuroraBackdrop } from './src/components/ui/aurora-flow';
 import { Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider } from '@shopify/restyle';
-import theme from './src/theme/restyleTheme';
+import theme from './src/constants/restyleTheme';
 import Toast from 'react-native-toast-message';
 import { toastConfig } from './src/components/notifications/ToastConfig';
 

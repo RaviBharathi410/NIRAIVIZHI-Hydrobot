@@ -3,7 +3,7 @@ import { View, StyleSheet, Platform } from 'react-native';
 import { CartesianChart, Line, Area, useChartPressState } from 'victory-native';
 import { useFont } from '@shopify/react-native-skia';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../atoms/Text';
 
 interface DataPoint {

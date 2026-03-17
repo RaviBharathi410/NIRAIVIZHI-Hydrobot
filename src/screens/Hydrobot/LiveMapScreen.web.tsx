@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, SafeAreaView, Dimensions } from 'react-native';
 import { useRobotStore } from '../../store/useRobotStore';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../../components/atoms/Text';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 

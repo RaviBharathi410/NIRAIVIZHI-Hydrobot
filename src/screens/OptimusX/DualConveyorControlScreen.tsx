@@ -149,7 +149,7 @@ export default function DualConveyorControlScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },
     content: { padding: SPACE[6], paddingTop: 80, paddingBottom: 60 },
-    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.white },
+    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.text },
     subtitle: { ...FONTS.medium, fontSize: 16, color: COLORS.textSecondary, marginBottom: SPACE[6] },
     conveyorCard: { padding: 16, marginBottom: 20 },
     beltContainer: { height: 60, width: '100%', backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 10, overflow: 'hidden', justifyContent: 'center' },
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     beltItem: { position: 'absolute', left: -30 },
     controlsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 20 },
     speedInfo: { alignItems: 'flex-start' },
-    speedVal: { ...FONTS.extraBold, fontSize: 24, color: COLORS.white },
+    speedVal: { ...FONTS.extraBold, fontSize: 24, color: COLORS.text },
     speedLabel: { ...FONTS.bold, fontSize: 10, color: COLORS.textMuted, letterSpacing: 1 },
     actionRow: { flexDirection: 'row' },
     speedBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.1)', justifyContent: 'center', alignItems: 'center', marginLeft: 12 },

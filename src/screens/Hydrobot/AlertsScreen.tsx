@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { View, StyleSheet, SectionList, SafeAreaView, TouchableOpacity } from 'react-native';
 import Animated, { FadeIn, FadeOutLeft } from 'react-native-reanimated';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../../components/atoms/Text';
 import { useAlertStore, Alert, AlertSeverity } from '../../store/useAlertStore';
 import { AlertItem } from '../../components/notifications/AlertItem';

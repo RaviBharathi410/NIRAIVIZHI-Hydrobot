@@ -10,9 +10,10 @@ import Animated, {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '@shopify/restyle';
 import { useNavigation } from '@react-navigation/native';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Button from '../atoms/Button';
 import Text from '../atoms/Text';
+import { COLORS, FONTS } from '../../constants/theme';
 
 const ACTIONS = [
     { icon: 'play', label: 'Start Mission', color: 'primary', route: 'FleetManagement' },
@@ -54,7 +55,7 @@ export function FABMenu() {
                                 variant="fab"
                                 style={{ backgroundColor: action.color === 'danger' ? theme.colors.danger : theme.colors.primary }}
                             >
-                                <MaterialCommunityIcons name={action.icon as any} size={24} color="white" />
+                                <MaterialCommunityIcons name={action.icon as any} size={24} color={COLORS.text} />
                             </Button>
                         </Animated.View>
                     ))}
@@ -67,7 +68,7 @@ export function FABMenu() {
                     { backgroundColor: theme.colors.primary },
                     rotationStyle
                 ]}>
-                    <MaterialCommunityIcons name="plus" size={32} color="white" />
+                    <MaterialCommunityIcons name="plus" size={32} color={COLORS.text} />
                 </Animated.View>
             </TouchableOpacity>
         </View>
@@ -113,15 +114,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     labelContainer: {
-        backgroundColor: 'rgba(15, 23, 42, 0.8)',
+        backgroundColor: COLORS.surface,
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 8,
         marginRight: 12,
     },
     label: {
-        color: 'white',
-        fontWeight: '700',
+        color: COLORS.text,
     }
 });
 

@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import Svg, { Path, Text as SvgText } from 'react-native-svg';
 import Animated, { useAnimatedProps, useSharedValue, withSpring, interpolateColor } from 'react-native-reanimated';
 import { useTheme } from '@shopify/restyle';
-import { Theme } from '../../theme/restyleTheme';
+import { Theme } from '../../constants/restyleTheme';
 import Text from '../atoms/Text';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);

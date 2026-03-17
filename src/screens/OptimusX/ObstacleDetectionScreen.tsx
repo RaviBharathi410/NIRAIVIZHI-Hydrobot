@@ -107,7 +107,7 @@ export default function ObstacleDetectionScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },
     content: { padding: SPACE[6], paddingTop: 80, paddingBottom: 60 },
-    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.white },
+    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.text, marginBottom: 8 },
     subtitle: { ...FONTS.medium, fontSize: 16, color: COLORS.textSecondary, marginBottom: SPACE[6] },
     radarWrapper: { alignItems: 'center', marginVertical: 30 },
     radarContainer: { width: 320, height: 320, borderRadius: 160, justifyContent: 'center', alignItems: 'center', padding: 0, overflow: 'hidden' },
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     logCard: { marginBottom: 10, paddingVertical: 12 },
     logRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12 },
     logInfo: { flex: 1, marginLeft: 16 },
-    logTitle: { ...FONTS.bold, fontSize: 15, color: COLORS.white },
+    logTitle: { ...FONTS.bold, fontSize: 15, color: COLORS.text },
     logSub: { ...FONTS.medium, fontSize: 12, color: COLORS.textMuted, marginTop: 2 },
     severityBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
     severityText: { ...FONTS.extraBold, fontSize: 9 },

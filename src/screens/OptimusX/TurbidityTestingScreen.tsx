@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background },
     loadingContent: { padding: SPACE[6], paddingTop: 80 },
     content: { padding: SPACE[6], paddingTop: 20, paddingBottom: 50 },
-    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.white },
+    title: { ...FONTS.extraBold, fontSize: 32, color: COLORS.text },
     subtitle: { ...FONTS.medium, fontSize: 16, color: COLORS.textSecondary, marginBottom: SPACE[6] },
     mainCard: { alignItems: 'center', paddingVertical: 40, marginBottom: 20 },
     visualizer: {
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.05)',
     },
     visualText: { ...FONTS.bold, fontSize: 15, marginLeft: 10, letterSpacing: 1 },
-    sectionTitle: { ...FONTS.bold, fontSize: 18, color: COLORS.white, marginBottom: 12 },
+    sectionTitle: { ...FONTS.bold, fontSize: 18, color: COLORS.text, marginBottom: 12 },
     manualText: { ...FONTS.regular, fontSize: 14, color: COLORS.textSecondary, lineHeight: 22, marginBottom: 20 },
     thresholdRow: { flexDirection: 'row', justifyContent: 'space-around', paddingTop: 20, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.05)' },
     tItem: { alignItems: 'center' },
@@ -173,6 +173,6 @@ const styles = StyleSheet.create({
     tLabel: { ...FONTS.medium, fontSize: 12, color: COLORS.textMuted, marginTop: 4 },
     emptyContainer: { alignItems: 'center', marginTop: 60, paddingHorizontal: 30 },
     centeredIcon: { marginBottom: 20 },
-    emptyTitle: { ...FONTS.bold, fontSize: 20, color: COLORS.white, marginTop: 24 },
+    emptyTitle: { ...FONTS.bold, fontSize: 20, color: COLORS.text, marginTop: 24 },
     emptySub: { ...FONTS.medium, fontSize: 14, color: COLORS.textSecondary, textAlign: 'center', marginTop: 8, lineHeight: 22 },
 });

@@ -3,7 +3,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { useTheme } from '@shopify/restyle';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Platform } from 'react-native';
-import { Theme } from '../theme/restyleTheme';
+import { Theme } from '../constants/restyleTheme';
 import { COLORS, FONTS } from '../constants/theme';
 import { ROLES } from '../constants/roles';
 
@@ -27,7 +27,7 @@ export default function GlobalDrawer({ initialRole }: { initialRole: string }) {
             drawerContent={(props) => <CustomDrawerContent {...props} />}
             screenOptions={{
                 headerShown: false,
-                drawerType: Platform.OS === 'web' ? 'permanent' : 'front',
+                drawerType: 'front',
                 drawerStyle: {
                     backgroundColor: COLORS.background,
                     width: Platform.OS === 'web' ? 280 : 300,
